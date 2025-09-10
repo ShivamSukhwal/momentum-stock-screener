@@ -724,12 +724,12 @@
         }
         
         .change-positive {
-            color: #00cc44 !important;
+            color: white !important;
             font-weight: bold !important;
         }
         
         .change-negative {
-            color: #ff4444 !important;
+            color: white !important;
             font-weight: bold !important;
         }
         
@@ -906,31 +906,31 @@
             </div>
             
             <div class="strategy-criteria">
-                <h3 style="color: #2c3e50; margin-bottom: 15px;">🔥 RUNNING UP SCANNER (Warrior Style):</h3>
+                <h3 style="color: #2c3e50; margin-bottom: 15px;">📊 HOW THE SCANNER WORKS:</h3>
                 <div class="criteria-grid">
                     <div class="criteria-item">
-                        <span class="criteria-label">🚀 % Gainers:</span>
-                        <span class="criteria-value">5%+ daily moves (green alerts 10%+)</span>
+                        <span class="criteria-label">🎯 ENTRY CRITERIA:</span>
+                        <span class="criteria-value">3%+ daily gainers, $0.50-$50 price range, 1.5x+ volume, <100M float</span>
                     </div>
                     <div class="criteria-item">
-                        <span class="criteria-label">💰 Price Range:</span>
-                        <span class="criteria-value">$1 - $20 (day trading sweet spot)</span>
+                        <span class="criteria-label">📈 NEW ENTRIES:</span>
+                        <span class="criteria-value">Only added when stock moves additional 1%+ up or down from last entry</span>
                     </div>
                     <div class="criteria-item">
-                        <span class="criteria-label">📊 Relative Volume:</span>
-                        <span class="criteria-value">2x+ average (hot movers)</span>
+                        <span class="criteria-label">🔥 EXPLOSIVE (25%+):</span>
+                        <span class="criteria-value">Massive breakout momentum - extreme moves with audio alert</span>
                     </div>
                     <div class="criteria-item">
-                        <span class="criteria-label">🏦 Float Size:</span>
-                        <span class="criteria-value"><100M shares (easier to move)</span>
+                        <span class="criteria-label">🚨 HOT (15%+):</span>
+                        <span class="criteria-value">Strong runner momentum - high-priority moves with audio alert</span>
                     </div>
                     <div class="criteria-item">
-                        <span class="criteria-label">⏱️ Live Updates:</span>
-                        <span class="criteria-value">Every 15 seconds real-time</span>
+                        <span class="criteria-label">💪 STRONG (10%+):</span>
+                        <span class="criteria-value">Good momentum build - solid moves worth monitoring closely</span>
                     </div>
                     <div class="criteria-item">
-                        <span class="criteria-label">🔔 Audio Alerts:</span>
-                        <span class="criteria-value">Sound on 15%+ hot runners</span>
+                        <span class="criteria-label">🏃 RUNNER (3-9.9%+):</span>
+                        <span class="criteria-value">Early momentum stage - building potential for larger moves</span>
                     </div>
                 </div>
             </div>
@@ -1337,21 +1337,37 @@
         // Warrior Trading style ticker universe (Ross Cameron favorites)
         const WARRIOR_TICKERS = [
             // Crypto/Mining (high volatility)
-            'RIOT', 'MARA', 'COIN', 'BTBT', 'EBON', 'CAN', 'BITF', 'HVBT', 'GREE', 'SPRT',
+            'RIOT', 'MARA', 'COIN', 'BTBT', 'EBON', 'CAN', 'BITF', 'HVBT', 'GREE', 'SPRT', 'WULF', 'CIFR', 'CORZ', 'HIVE', 'IREN',
             // Meme/Social Media favorites  
-            'GME', 'AMC', 'BBBY', 'PLTR', 'SOFI', 'CLOV', 'WISH', 'PROG', 'ATER', 'SPCE',
+            'GME', 'AMC', 'BBBY', 'PLTR', 'SOFI', 'CLOV', 'WISH', 'PROG', 'ATER', 'SPCE', 'HOOD', 'RBLX', 'SNAP', 'TWTR', 'PINS',
             // EV/Clean Energy (momentum favorites)
-            'TSLA', 'LCID', 'RIVN', 'NKLA', 'PLUG', 'FCEL', 'BLNK', 'CHPT', 'EVGO', 'CLNE',
+            'TSLA', 'LCID', 'RIVN', 'NKLA', 'PLUG', 'FCEL', 'BLNK', 'CHPT', 'EVGO', 'CLNE', 'NIO', 'XPEV', 'LI', 'FISV', 'QS',
             // Biotech/Pharma (FDA catalyst plays)
-            'MRNA', 'BNTX', 'NVAX', 'OCGN', 'VXRT', 'ATOS', 'SAVA', 'SENS', 'MVIS', 'GEVO',
+            'MRNA', 'BNTX', 'NVAX', 'OCGN', 'VXRT', 'ATOS', 'SAVA', 'SENS', 'MVIS', 'GEVO', 'IOVA', 'CTMX', 'AVIR', 'VERU', 'CYDY',
             // Low float runners
-            'MULN', 'BBIG', 'RDBX', 'NILE', 'GFAI', 'IMPP', 'INDO', 'EVFM', 'GROM', 'TNXP',
+            'MULN', 'BBIG', 'RDBX', 'NILE', 'GFAI', 'IMPP', 'INDO', 'EVFM', 'GROM', 'TNXP', 'APPH', 'BKKT', 'IRNT', 'OPAD', 'LIXT',
             // Penny stock momentum
-            'SNDL', 'NOK', 'F', 'EXPR', 'NAKD', 'SIRI', 'KOSS', 'TELL', 'PHUN', 'DWAC',
+            'SNDL', 'NOK', 'F', 'EXPR', 'NAKD', 'SIRI', 'KOSS', 'TELL', 'PHUN', 'DWAC', 'TLRY', 'CGC', 'ACB', 'HEXO', 'OGI',
             // Tech small caps
-            'CRSP', 'EDIT', 'BEAM', 'NTLA', 'FATE', 'BLUE', 'SGMO', 'QURE', 'RGNX', 'FOLD',
+            'CRSP', 'EDIT', 'BEAM', 'NTLA', 'FATE', 'BLUE', 'SGMO', 'QURE', 'RGNX', 'FOLD', 'PACB', 'VEEV', 'DDOG', 'SNOW', 'OKTA',
             // Traditional momentum
-            'AAPL', 'NVDA', 'AMD', 'MSFT', 'GOOGL', 'META', 'AMZN', 'NFLX', 'CRM', 'SHOP'
+            'AAPL', 'NVDA', 'AMD', 'MSFT', 'GOOGL', 'META', 'AMZN', 'NFLX', 'CRM', 'SHOP', 'PYPL', 'SQ', 'UBER', 'LYFT', 'ABNB',
+            // Chinese ADRs (momentum plays)
+            'BABA', 'JD', 'PDD', 'BILI', 'IQ', 'VIPS', 'TME', 'YMM', 'FUTU', 'TIGR', 'BEKE', 'DIDI', 'TAL', 'EDU', 'GOTU',
+            // SPACs and recent IPOs
+            'GRAB', 'DKNG', 'OPEN', 'UPST', 'AFRM', 'COIN', 'RBLX', 'DASH', 'ABNB', 'SNOW', 'PLTR', 'C3AI', 'FSLY', 'NET', 'ZM',
+            // Healthcare/Medical
+            'TDOC', 'VEEV', 'DXCM', 'ILMN', 'REGN', 'BIIB', 'GILD', 'AMGN', 'CELG', 'VRTX', 'BMRN', 'ALNY', 'SRPT', 'RARE', 'IONS',
+            // Fintech
+            'SQ', 'PYPL', 'AFRM', 'UPST', 'SOFI', 'LC', 'HOOD', 'NU', 'PAGS', 'STNE', 'MA', 'V', 'AXP', 'COF', 'DFS',
+            // Growth stocks
+            'ZM', 'DOCU', 'PTON', 'NFLX', 'ROKU', 'TWLO', 'OKTA', 'CRWD', 'ZS', 'DDOG', 'SNOW', 'MDB', 'FROG', 'ESTC', 'SPLK',
+            // Energy/Oil
+            'XOM', 'CVX', 'COP', 'EOG', 'PXD', 'SLB', 'HAL', 'OXY', 'DVN', 'FANG', 'MRO', 'APA', 'CLR', 'CTRA', 'VLO',
+            // Materials/Commodities
+            'FCX', 'NEM', 'GOLD', 'ABX', 'SCCO', 'AA', 'X', 'CLF', 'NUE', 'STLD', 'MP', 'LAC', 'ALB', 'SQM', 'FMC',
+            // Small cap runners (high beta)
+            'BBBY', 'SAVA', 'DWAC', 'PHUN', 'BKKT', 'IRNT', 'OPAD', 'ATER', 'PROG', 'BBIG', 'SPRT', 'GREE', 'RDBX', 'NILE', 'MULN'
         ];
         
         // Warrior Trading scanner variables
@@ -1363,6 +1379,57 @@
         let currentRunners = new Map(); // Current running stocks
         let runnerHistory = []; // All runner entries (including duplicates for price changes)
         let priceHistory = new Map(); // Track last known prices
+        
+        // Save runner data to localStorage
+        function saveRunnerData() {
+            try {
+                const dataToSave = {
+                    runnerHistory: runnerHistory,
+                    priceHistory: Array.from(priceHistory.entries()),
+                    currentRunners: Array.from(currentRunners.entries()),
+                    triggeredStocks: Array.from(triggeredStocks),
+                    totalScanned: totalScanned,
+                    triggersFound: triggersFound,
+                    lastSaved: new Date().toISOString()
+                };
+                localStorage.setItem('warriorScannerData', JSON.stringify(dataToSave));
+            } catch (error) {
+                console.warn('Failed to save scanner data:', error);
+            }
+        }
+        
+        // Load runner data from localStorage
+        function loadRunnerData() {
+            try {
+                const savedData = localStorage.getItem('warriorScannerData');
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    
+                    // Restore data
+                    runnerHistory = data.runnerHistory || [];
+                    priceHistory = new Map(data.priceHistory || []);
+                    currentRunners = new Map(data.currentRunners || []);
+                    triggeredStocks = new Set(data.triggeredStocks || []);
+                    totalScanned = data.totalScanned || 0;
+                    triggersFound = data.triggersFound || 0;
+                    
+                    // Update UI with restored data
+                    updateRunnerTable();
+                    updateScanStats(totalScanned, triggersFound);
+                    
+                    if (runnerHistory.length > 0) {
+                        const uniqueStocks = new Set(runnerHistory.map(r => r.symbol)).size;
+                        updateLiveStatus(`📚 Restored ${runnerHistory.length} entries, ${uniqueStocks} unique runners`);
+                    }
+                    
+                    console.log('Scanner data restored from localStorage');
+                    return true;
+                }
+            } catch (error) {
+                console.warn('Failed to load scanner data:', error);
+            }
+            return false;
+        }
         let audioEnabled = false;
         let audioContext = null;
         
@@ -1413,6 +1480,15 @@
             currentRunners.clear();
             runnerHistory = [];
             priceHistory.clear();
+            triggeredStocks.clear();
+            totalScanned = 0;
+            triggersFound = 0;
+            
+            // Clear localStorage
+            localStorage.removeItem('warriorScannerData');
+            
+            // Reset UI
+            updateScanStats(0, 0);
             const tableBody = document.getElementById('runnerTableBody');
             tableBody.innerHTML = `
                 <tr class="scanning-row">
@@ -1445,15 +1521,10 @@
             const lastChangePct = lastEntry.change_pct;
             const changeDifference = Math.abs(currentChangePct - lastChangePct);
             
-            // Add new entry if:
-            // 1. Stock moved an additional 1%+ from last entry
-            // 2. OR if it's been more than 5 minutes since last entry
-            const timeDifference = (new Date() - lastEntry.timestamp) / (1000 * 60); // minutes
-            
+            // Only add new entry if stock moved an additional 1%+ from last entry
+            // Removed time-based updates - only actual price movements matter
             if (changeDifference >= PRICE_CHANGE_THRESHOLD) {
                 return 'new_move';
-            } else if (timeDifference >= 5) {
-                return 'time_update';
             }
             
             return false;
@@ -1506,8 +1577,8 @@
                 // Randomize order to scan different stocks each time
                 const shuffledTickers = [...WARRIOR_TICKERS].sort(() => Math.random() - 0.5);
                 
-                // Scan more stocks per cycle with faster refresh (30 stocks every 15 seconds)
-                const subsetsToScan = shuffledTickers.slice(0, 30);
+                // Scan more stocks per cycle with faster refresh (50 stocks every 15 seconds)
+                const subsetsToScan = shuffledTickers.slice(0, 50);
                 
                 for (const ticker of subsetsToScan) {
                     if (!liveFeedActive) break; // Stop if feed was disabled
@@ -1557,6 +1628,9 @@
                                 
                                 // Add to history (this allows multiple entries)
                                 runnerHistory.unshift(runner); // Add to beginning for newest first
+                                
+                                // Save data after adding new runner
+                                saveRunnerData();
                                 
                                 // Keep only recent entries to prevent memory issues
                                 if (runnerHistory.length > 100) {
@@ -1835,9 +1909,9 @@
             
             // Warrior Trading "Running Up" criteria:
             const criteria = {
-                priceRange: price >= 1.0 && price <= 20.0,      // $1-$20 sweet spot
-                percentGainer: changePct >= 5.0,                 // 5%+ daily gainers
-                volumeRequirement: relVolume >= 2.0,             // 2x+ relative volume
+                priceRange: price >= 0.50 && price <= 50.0,     // $0.50-$50 broader range
+                percentGainer: changePct >= 3.0,                 // 3%+ daily gainers (more inclusive)
+                volumeRequirement: relVolume >= 1.5,             // 1.5x+ relative volume (more inclusive)
                 minimumVolume: volume >= 100000,                 // 100k+ shares traded
                 floatSize: calculateFloat(data) <= 100           // <100M float (estimated)
             };
@@ -2234,6 +2308,9 @@
         
         // Allow Enter key in ticker input
         document.addEventListener('DOMContentLoaded', function() {
+            // Load saved scanner data on page load
+            loadRunnerData();
+            
             const tickerInput = document.getElementById('tickerInput');
             if (tickerInput) {
                 tickerInput.addEventListener('keypress', function(e) {
