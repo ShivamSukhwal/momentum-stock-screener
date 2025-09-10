@@ -1750,13 +1750,24 @@
         }
         
         function getTimeAgo(date) {
-            const diffMs = new Date() - date;
+            // Handle invalid dates
+            if (!date) return 'now';
+            
+            const validDate = new Date(date);
+            if (isNaN(validDate.getTime())) return 'now';
+            
+            const diffMs = new Date() - validDate;
             const diffSecs = Math.floor(diffMs / 1000);
             const diffMins = Math.floor(diffSecs / 60);
             
+            if (diffSecs < 0) return 'now'; // Future dates
             if (diffSecs < 60) return diffSecs + 's';
             if (diffMins < 60) return diffMins + 'm';
-            return Math.floor(diffMins / 60) + 'h';
+            
+            const diffHours = Math.floor(diffMins / 60);
+            if (diffHours < 24) return diffHours + 'h';
+            
+            return Math.floor(diffHours / 24) + 'd';
         }
         
         // Add new triggers to the display
