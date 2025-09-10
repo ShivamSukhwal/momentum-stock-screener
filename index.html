@@ -244,19 +244,19 @@
                 </div>
                 <div class="control-item">
                     <label>Max Price ($)</label>
-                    <input type="number" id="maxPrice" value="20.0" step="0.1">
+                    <input type="number" id="maxPrice" value="500.0" step="0.1">
                 </div>
                 <div class="control-item">
                     <label>Min Gain (%)</label>
-                    <input type="number" id="minGain" value="10.0" step="0.1">
+                    <input type="number" id="minGain" value="2.0" step="0.1">
                 </div>
                 <div class="control-item">
                     <label>Max Float (M shares)</label>
-                    <input type="number" id="maxFloat" value="20.0" step="1">
+                    <input type="number" id="maxFloat" value="1000.0" step="1">
                 </div>
                 <div class="control-item">
                     <label>Min Relative Volume (x)</label>
-                    <input type="number" id="minRelVol" value="5.0" step="0.1">
+                    <input type="number" id="minRelVol" value="0.5" step="0.1">
                 </div>
                 <div class="control-item">
                     <label>Stock Limit</label>
@@ -276,8 +276,8 @@
         // API Configuration
         const API_BASE_URL = 'https://api.shivamyourmom.com';
         
-        // Sample tickers for screening (top momentum candidates)
-        const SAMPLE_TICKERS = ['AAPL', 'TSLA', 'NVDA', 'AMD', 'PLTR', 'SOFI', 'RIOT', 'MARA', 'GME', 'AMC', 'BBBY', 'SPCE', 'LCID', 'RIVN', 'F'];
+        // Sample tickers for screening (diverse momentum candidates)
+        const SAMPLE_TICKERS = ['AAPL', 'TSLA', 'NVDA', 'AMD', 'GOOGL', 'MSFT', 'META', 'AMZN', 'NFLX', 'PLTR', 'SOFI', 'RIOT', 'MARA', 'GME', 'AMC', 'SPCE', 'LCID', 'RIVN', 'F', 'BAC'];
 
         document.getElementById('runScreener').addEventListener('click', async function() {
             const button = this;
@@ -333,20 +333,17 @@
                 const data = await response.json();
                 
                 // Transform API data to match our display format
-                if (data.prev && data.prev.status === 'OK' && data.last_price) {
-                    const prevClose = data.prev.close;
-                    const currentPrice = data.last_price;
-                    const changePercent = prevClose ? ((currentPrice - prevClose) / prevClose) * 100 : 0;
-                    
+                if (data.last_price && data.prev) {
                     return {
                         symbol: ticker,
-                        price: currentPrice,
-                        change_pct: changePercent,
+                        price: data.last_price,
+                        change_pct: data.price_change_pct || 0,
                         volume: data.today_volume || 0,
-                        relative_volume: data.rvol || 0,
-                        float_millions: Math.random() * 50, // API doesn't provide this, using random for demo
-                        has_catalyst: Math.random() > 0.7, // Random catalyst detection
-                        news_count: Math.floor(Math.random() * 6)
+                        relative_volume: data.rvol || 1.0,
+                        float_millions: Math.random() * 50 + 10, // Simulate float data
+                        has_catalyst: data.momentum_score > 70, // Use momentum score for catalyst
+                        news_count: Math.floor(Math.random() * 6),
+                        momentum_score: data.momentum_score || 50
                     };
                 }
                 return null;
@@ -395,11 +392,11 @@
             
             try {
                 const defaultCriteria = {
-                    minPrice: 2.0,
-                    maxPrice: 50.0,
-                    minGain: 0.0, // Lower threshold for auto-load
-                    maxFloat: 100.0, // Higher threshold for auto-load
-                    minRelVol: 1.0 // Lower threshold for auto-load
+                    minPrice: 1.0,
+                    maxPrice: 1000.0,
+                    minGain: -10.0, // Show both gainers and losers
+                    maxFloat: 5000.0, // Very high to include all stocks
+                    minRelVol: 0.1 // Very low to include all stocks
                 };
                 
                 const stocks = [];
@@ -415,10 +412,10 @@
                     await new Promise(resolve => setTimeout(resolve, 100));
                 }
                 
-                // Sort by change percentage and take top 10
+                // Sort by absolute change percentage (biggest movers) and take top 10
                 const topStocks = stocks
-                    .filter(stock => stock.change_pct !== 0)
-                    .sort((a, b) => b.change_pct - a.change_pct)
+                    .filter(stock => stock.price > 0)
+                    .sort((a, b) => Math.abs(b.change_pct) - Math.abs(a.change_pct))
                     .slice(0, 10);
                 
                 displayResults(topStocks, defaultCriteria, true);
