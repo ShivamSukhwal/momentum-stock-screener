@@ -7,8 +7,11 @@ load_dotenv()
 app = Flask(__name__)
 
 POLYGON_API_KEY = os.getenv("POLYGON_API_KEY")
+FINNHUB_API_KEY = os.getenv("FINNHUB_API_KEY")
 if not POLYGON_API_KEY:
     raise ValueError("POLYGON_API_KEY not found in environment variables. Please check your .env file.")
+if not FINNHUB_API_KEY:
+    raise ValueError("FINNHUB_API_KEY not found in environment variables. Please check your .env file.")
 POLY = "https://api.polygon.io"
 
 def http_get(path, params=None, timeout=10):
@@ -202,7 +205,8 @@ def index():
             "real_time_quote": "/quote?ticker=AAPL", 
             "full_metrics": "/metrics?ticker=AAPL",
             "multiple_stocks": "/stocks?tickers=AAPL,TSLA,AMD",
-            "multiple_with_metrics": "/stocks?tickers=AAPL,TSLA&metrics=1"
+            "multiple_with_metrics": "/stocks?tickers=AAPL,TSLA&metrics=1",
+            "market_news": "/news"
         }
     })
 
@@ -268,6 +272,44 @@ def stocks():
         except requests.exceptions.RequestException as e:
             results[t] = {"ticker": t, "error": str(e)}
     return jsonify(results), 200
+
+def get_finnhub_news():
+    """Get general market news from Finnhub"""
+    try:
+        url = "https://finnhub.io/api/v1/news"
+        params = {
+            'category': 'general',
+            'token': FINNHUB_API_KEY
+        }
+        response = requests.get(url, params=params, timeout=10)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Finnhub news error: {e}")
+        return []
+
+@app.route("/news")
+def news():
+    """Get latest stock market news"""
+    try:
+        news_data = get_finnhub_news()
+        
+        # Format news for frontend
+        formatted_news = []
+        for item in news_data[:15]:  # Limit to 15 articles
+            formatted_news.append({
+                "headline": item.get("headline", ""),
+                "summary": item.get("summary", "")[:200] + "..." if len(item.get("summary", "")) > 200 else item.get("summary", ""),
+                "source": item.get("source", "Unknown"),
+                "datetime": datetime.datetime.fromtimestamp(item.get("datetime", 0)).isoformat() if item.get("datetime") else datetime.datetime.now().isoformat(),
+                "url": item.get("url", ""),
+                "image": item.get("image", "")
+            })
+        
+        return jsonify(formatted_news), 200
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
