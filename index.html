@@ -686,26 +686,68 @@
             width: 100%;
             border-collapse: collapse;
             background: white;
-            font-size: 0.9em;
+            font-size: 0.85em;
+            table-layout: fixed;
         }
+        
+        .live-scanner-table th:nth-child(1) { width: 8%; }  /* Symbol */
+        .live-scanner-table th:nth-child(2) { width: 10%; } /* Price */
+        .live-scanner-table th:nth-child(3) { width: 10%; } /* Change % */
+        .live-scanner-table th:nth-child(4) { width: 10%; } /* Change $ */
+        .live-scanner-table th:nth-child(5) { width: 12%; } /* Volume */
+        .live-scanner-table th:nth-child(6) { width: 8%; }  /* Rel Vol */
+        .live-scanner-table th:nth-child(7) { width: 8%; }  /* Float */
+        .live-scanner-table th:nth-child(8) { width: 12%; } /* News */
+        .live-scanner-table th:nth-child(9) { width: 14%; } /* Category */
+        .live-scanner-table th:nth-child(10) { width: 8%; } /* Time */
         
         .live-scanner-table th {
             background: linear-gradient(135deg, #1a1a1a 0%, #333333 100%);
             color: white;
-            padding: 12px 8px;
+            padding: 12px 6px;
             text-align: center;
             font-weight: bold;
-            font-size: 0.85em;
+            font-size: 0.8em;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             border-bottom: 2px solid #555;
+            white-space: nowrap;
         }
         
         .live-scanner-table td {
-            padding: 8px;
+            padding: 8px 4px;
             text-align: center;
             border-bottom: 1px solid #f0f0f0;
             font-weight: 500;
+            font-size: 0.85em;
+            white-space: nowrap;
+        }
+        
+        .change-positive {
+            color: #00cc44 !important;
+            font-weight: bold !important;
+        }
+        
+        .change-negative {
+            color: #ff4444 !important;
+            font-weight: bold !important;
+        }
+        
+        .news-link {
+            color: #3498db;
+            text-decoration: none;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        
+        .news-link:hover {
+            color: #2980b9;
+            text-decoration: underline;
+        }
+        
+        .no-news {
+            color: #999;
+            font-size: 0.8em;
         }
         
         .live-scanner-table tbody tr {
@@ -924,13 +966,14 @@
                                 <th>Volume</th>
                                 <th>Rel Vol</th>
                                 <th>Float</th>
+                                <th>News</th>
                                 <th>Category</th>
                                 <th>Time</th>
                             </tr>
                         </thead>
                         <tbody id="runnerTableBody">
                             <tr class="scanning-row">
-                                <td colspan="9">
+                                <td colspan="10">
                                     <div class="scanning-animation">
                                         <div class="pulse-dot"></div>
                                         <span>Scanning for runners...</span>
@@ -1349,7 +1392,7 @@
             const tableBody = document.getElementById('runnerTableBody');
             tableBody.innerHTML = `
                 <tr class="scanning-row">
-                    <td colspan="9">
+                    <td colspan="10">
                         <div class="scanning-animation">
                             <div class="pulse-dot"></div>
                             <span>Scanning for runners...</span>
@@ -1421,6 +1464,9 @@
                     if (data && data.last_price && data.price_change_pct !== undefined) {
                         // Check if it meets strategy and we haven't triggered on it recently
                         if (meetsWarriorTradingCriteria(data, ticker)) {
+                            // Check for breaking news
+                            const newsData = await checkBreakingNews(ticker);
+                            
                             const runner = {
                                 symbol: ticker,
                                 price: data.last_price,
@@ -1430,7 +1476,9 @@
                                 rel_volume: data.rvol || 1,
                                 float_millions: calculateFloat(data),
                                 last_updated: new Date(),
-                                category: getRunnerCategory(data.price_change_pct)
+                                category: getRunnerCategory(data.price_change_pct),
+                                news_url: newsData ? getNewsUrl(newsData, ticker) : null,
+                                has_news: newsData
                             };
                             
                             // Check if this is a new hot runner for alerts
@@ -1509,7 +1557,7 @@
             if (currentRunners.size === 0) {
                 tableBody.innerHTML = `
                     <tr class="scanning-row">
-                        <td colspan="9">
+                        <td colspan="10">
                             <div class="scanning-animation">
                                 <div class="pulse-dot"></div>
                                 <span>No runners found - scanning...</span>
@@ -1529,15 +1577,21 @@
                 const changeSymbol = runner.change_pct >= 0 ? '+' : '';
                 const timeAgo = getTimeAgo(runner.last_updated);
                 
+                const changeClass = runner.change_pct >= 0 ? 'change-positive' : 'change-negative';
+                const newsCell = runner.news_url ? 
+                    `<a href="${runner.news_url}" target="_blank" class="news-link">📰 News</a>` : 
+                    '<span class="no-news">—</span>';
+                
                 tableRows += `
                     <tr class="scanner-row runner-${runner.category.level}">
                         <td class="runner-symbol">${runner.symbol}</td>
                         <td class="runner-price">$${runner.price.toFixed(2)}</td>
-                        <td style="color: ${runner.category.color}; font-weight: bold;">${changeSymbol}${runner.change_pct.toFixed(1)}%</td>
-                        <td style="color: ${runner.category.color}; font-weight: bold;">${changeSymbol}$${Math.abs(runner.change).toFixed(2)}</td>
+                        <td class="${changeClass}">${changeSymbol}${runner.change_pct.toFixed(1)}%</td>
+                        <td class="${changeClass}">${changeSymbol}$${Math.abs(runner.change).toFixed(2)}</td>
                         <td>${formatVolume(runner.volume)}</td>
                         <td style="font-weight: bold;">${runner.rel_volume.toFixed(1)}x</td>
                         <td>${runner.float_millions.toFixed(0)}M</td>
+                        <td>${newsCell}</td>
                         <td>
                             <span class="category-badge" style="background: ${runner.category.color}; color: white;">
                                 ${runner.category.level.toUpperCase()}
@@ -1758,16 +1812,32 @@
                     mode: 'cors'
                 });
                 
-                if (!response.ok) return false;
+                if (!response.ok) return null;
                 const data = await response.json();
                 
-                // Check if ticker was mentioned in recent news (last 2 hours)
-                return data.has_recent_news && data.news_count > 0;
+                // Return the full news data if ticker has recent news
+                if (data.has_recent_news && data.news_count > 0 && data.articles && data.articles.length > 0) {
+                    return data.articles[0]; // Return the most recent article
+                }
+                
+                return null;
                 
             } catch (error) {
                 console.warn(`News check failed for ${ticker}:`, error);
-                return false;
+                return null;
             }
+        }
+        
+        // Generate news URL or search link
+        function getNewsUrl(newsData, ticker) {
+            // If we have a direct news URL, use it
+            if (newsData && newsData.url) {
+                return newsData.url;
+            }
+            
+            // Otherwise, create a Google News search link
+            const searchQuery = encodeURIComponent(`${ticker} stock news today`);
+            return `https://news.google.com/search?q=${searchQuery}&hl=en-US&gl=US&ceid=US:en`;
         }
         
         // Log scanner hit to backend
