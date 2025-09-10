@@ -897,8 +897,8 @@
             
             <div class="live-feed-stats">
                 <div class="stat-item">
-                    <span class="stat-value" id="total-scanned">0</span>
-                    <span class="stat-label">Stocks Scanned</span>
+                    <span class="stat-value" id="market-status">CLOSED</span>
+                    <span class="stat-label">Market Status</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-value" id="triggers-found">0</span>
@@ -1384,7 +1384,7 @@
                     
                     // Update UI with restored data
                     updateRunnerTable();
-                    updateScanStats(totalScanned, triggersFound);
+                    updateScanStats(0, triggersFound);
                     
                     if (runnerHistory.length > 0) {
                         const uniqueStocks = new Set(runnerHistory.map(r => r.symbol)).size;
@@ -1556,7 +1556,7 @@
                     scannedInThisRound++;
                     totalScanned++;
                     
-                    updateScanStats(totalScanned, triggersFound);
+                    updateScanStats(0, triggersFound);
                     
                     if (data && data.last_price && data.price_change_pct !== undefined) {
                         // Check if it meets strategy and we haven't triggered on it recently
@@ -1650,7 +1650,7 @@
                     updateLiveStatus('✅ Scan complete - no runners found');
                 }
                 
-                updateScanStats(totalScanned, triggersFound);
+                updateScanStats(0, triggersFound);
                 
             } catch (error) {
                 updateLiveStatus('❌ Scan error - retrying soon...');
@@ -1666,13 +1666,39 @@
             }
         }
         
+        // Get current market status
+        function getMarketStatus() {
+            const now = new Date();
+            const et = new Date(now.toLocaleString("en-US", {timeZone: "America/New_York"}));
+            const day = et.getDay(); // 0 = Sunday, 6 = Saturday
+            const hour = et.getHours();
+            const minute = et.getMinutes();
+            const time = hour * 100 + minute; // Convert to HHMM format
+            
+            // Weekend
+            if (day === 0 || day === 6) {
+                return 'CLOSED';
+            }
+            
+            // Weekday times (Eastern Time)
+            if (time >= 400 && time < 930) {
+                return 'PRE-MARKET';
+            } else if (time >= 930 && time < 1600) {
+                return 'OPEN';
+            } else if (time >= 1600 && time < 2000) {
+                return 'AFTER-HOURS';
+            } else {
+                return 'CLOSED';
+            }
+        }
+        
         // Update scan statistics
         function updateScanStats(scanned, found) {
-            const totalScannedEl = document.getElementById('total-scanned');
+            const marketStatusEl = document.getElementById('market-status');
             const triggersFoundEl = document.getElementById('triggers-found');
             const lastScanEl = document.getElementById('last-scan');
             
-            if (totalScannedEl) totalScannedEl.textContent = scanned;
+            if (marketStatusEl) marketStatusEl.textContent = getMarketStatus();
             if (triggersFoundEl) triggersFoundEl.textContent = found;
             if (lastScanEl) lastScanEl.textContent = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
         }
