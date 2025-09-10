@@ -848,14 +848,8 @@
         </div>
         
         <div class="tabs">
-            <button class="tab active" onclick="switchTab('gainers')">
-                🚀 Top Gainers ($2-$20)
-            </button>
-            <button class="tab" onclick="switchTab('volume')">
-                📊 High Volume Leaders
-            </button>
-            <button class="tab" onclick="switchTab('strategy')">
-                🎯 My Strategy
+            <button class="tab active" onclick="switchTab('strategy')">
+                🎯 Live Scanner
             </button>
             <button class="tab" onclick="switchTab('tracker')">
                 📈 Ticker Tracker
@@ -865,36 +859,8 @@
             </button>
         </div>
         
-        <!-- Top Gainers Tab -->
-        <div id="gainers" class="tab-content active">
-            <div class="section-header">
-                <h2 class="section-title">🚀 Top Gainers ($2-$20 Range)</h2>
-                <button class="refresh-btn" onclick="loadGainers()">↻ Refresh</button>
-            </div>
-            <div id="gainers-content">
-                <div class="loading">
-                    <div class="spinner"></div>
-                    <p>Loading top gainers...</p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- High Volume Tab -->
-        <div id="volume" class="tab-content">
-            <div class="section-header">
-                <h2 class="section-title">📊 Highest Relative Volume</h2>
-                <button class="refresh-btn" onclick="loadHighVolume()">↻ Refresh</button>
-            </div>
-            <div id="volume-content">
-                <div class="loading">
-                    <div class="spinner"></div>
-                    <p>Loading high volume stocks...</p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- My Strategy Tab -->
-        <div id="strategy" class="tab-content">
+        <!-- Live Scanner Tab -->
+        <div id="strategy" class="tab-content active">
             <div class="section-header">
                 <h2 class="section-title">🔥 RUNNING UP SCANNER</h2>
                 <div class="live-status">
