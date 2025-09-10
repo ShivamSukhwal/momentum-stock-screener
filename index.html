@@ -685,7 +685,7 @@
         .live-scanner-table {
             width: 100%;
             border-collapse: collapse;
-            background: white;
+            background: #2c3e50;
             font-size: 0.85em;
             table-layout: fixed;
         }
@@ -717,10 +717,12 @@
         .live-scanner-table td {
             padding: 8px 4px;
             text-align: center;
-            border-bottom: 1px solid #f0f0f0;
+            border-bottom: 1px solid #34495e;
             font-weight: 500;
             font-size: 0.85em;
             white-space: nowrap;
+            color: white;
+            background: #2c3e50;
         }
         
         .change-positive {
@@ -906,16 +908,8 @@
             </div>
             
             <div class="strategy-criteria">
-                <h3 style="color: #2c3e50; margin-bottom: 15px;">📊 HOW THE SCANNER WORKS:</h3>
+                <h3 style="color: #2c3e50; margin-bottom: 15px;">🏷️ CATEGORY MEANINGS:</h3>
                 <div class="criteria-grid">
-                    <div class="criteria-item">
-                        <span class="criteria-label">🎯 ENTRY CRITERIA:</span>
-                        <span class="criteria-value">3%+ daily gainers, $0.50-$50 price range, 1.5x+ volume, <100M float</span>
-                    </div>
-                    <div class="criteria-item">
-                        <span class="criteria-label">📈 NEW ENTRIES:</span>
-                        <span class="criteria-value">Only added when stock moves additional 1%+ up or down from last entry</span>
-                    </div>
                     <div class="criteria-item">
                         <span class="criteria-label">🔥 EXPLOSIVE (25%+):</span>
                         <span class="criteria-value">Massive breakout momentum - extreme moves with audio alert</span>
@@ -1591,7 +1585,7 @@
                     
                     if (data && data.last_price && data.price_change_pct !== undefined) {
                         // Check if it meets strategy and we haven't triggered on it recently
-                        if (meetsWarriorTradingCriteria(data, ticker)) {
+                        if (await meetsWarriorTradingCriteria(data, ticker)) {
                             const currentPrice = data.last_price;
                             const currentChangePct = data.price_change_pct;
                             
@@ -1901,23 +1895,40 @@
         }
         
         // Ross Cameron "Running Up" scanner criteria
-        function meetsWarriorTradingCriteria(data, ticker) {
+        async function meetsWarriorTradingCriteria(data, ticker) {
             const price = data.last_price;
             const changePct = data.price_change_pct;
             const relVolume = data.rvol || 1;
             const volume = data.today_volume || 0;
             
-            // Warrior Trading "Running Up" criteria:
-            const criteria = {
+            // Check for breaking news first
+            const newsData = await checkBreakingNews(ticker);
+            const hasBreakingNews = newsData && newsData.recent_news && newsData.recent_news.length > 0;
+            
+            // Basic requirements (always required)
+            const basicCriteria = {
                 priceRange: price >= 0.50 && price <= 50.0,     // $0.50-$50 broader range
-                percentGainer: changePct >= 3.0,                 // 3%+ daily gainers (more inclusive)
-                volumeRequirement: relVolume >= 1.5,             // 1.5x+ relative volume (more inclusive)
-                minimumVolume: volume >= 100000,                 // 100k+ shares traded
+                minimumVolume: volume >= 50000,                  // Lower minimum for news stocks
                 floatSize: calculateFloat(data) <= 100           // <100M float (estimated)
             };
             
-            // Must meet ALL criteria for "Running Up"
-            return Object.values(criteria).every(met => met === true);
+            // If stock has breaking news, relax other criteria
+            if (hasBreakingNews) {
+                const newsCriteria = {
+                    percentGainer: Math.abs(changePct) >= 1.0,   // 1%+ move (up or down) with news
+                    volumeRequirement: relVolume >= 1.0,         // Any above-average volume
+                };
+                return Object.values({...basicCriteria, ...newsCriteria}).every(met => met === true);
+            }
+            
+            // Standard Warrior Trading "Running Up" criteria (no news)
+            const standardCriteria = {
+                percentGainer: changePct >= 3.0,                 // 3%+ daily gainers
+                volumeRequirement: relVolume >= 1.5,             // 1.5x+ relative volume
+                minimumVolume: volume >= 100000,                 // 100k+ shares traded
+            };
+            
+            return Object.values({...basicCriteria, ...standardCriteria}).every(met => met === true);
         }
         
         // Get hot runner category for alerts
