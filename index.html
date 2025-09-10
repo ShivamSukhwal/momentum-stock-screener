@@ -674,6 +674,110 @@
             50% { opacity: 0.8; }
             100% { opacity: 1; }
         }
+        
+        .warrior-scanner-table {
+            margin-top: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .live-scanner-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            font-size: 0.9em;
+        }
+        
+        .live-scanner-table th {
+            background: linear-gradient(135deg, #1a1a1a 0%, #333333 100%);
+            color: white;
+            padding: 12px 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #555;
+        }
+        
+        .live-scanner-table td {
+            padding: 8px;
+            text-align: center;
+            border-bottom: 1px solid #f0f0f0;
+            font-weight: 500;
+        }
+        
+        .live-scanner-table tbody tr {
+            transition: all 0.3s ease;
+        }
+        
+        .live-scanner-table tbody tr:hover {
+            background: #f8f9fa;
+            transform: scale(1.01);
+        }
+        
+        .scanner-row {
+            animation: slideInRunner 0.5s ease-out;
+        }
+        
+        @keyframes slideInRunner {
+            0% { opacity: 0; transform: translateY(-10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        
+        .runner-symbol {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #2c3e50;
+        }
+        
+        .runner-price {
+            font-weight: bold;
+            color: #8e44ad;
+        }
+        
+        .runner-explosive {
+            background: linear-gradient(135deg, #ff0066 0%, #ff3388 100%) !important;
+            color: white !important;
+            animation: pulse-explosive 1s infinite;
+        }
+        
+        .runner-hot {
+            background: linear-gradient(135deg, #ff4444 0%, #ff6666 100%) !important;
+            color: white !important;
+        }
+        
+        .runner-strong {
+            background: linear-gradient(135deg, #ff8800 0%, #ffaa00 100%) !important;
+            color: white !important;
+        }
+        
+        .runner-runner {
+            background: linear-gradient(135deg, #00cc44 0%, #00dd55 100%) !important;
+            color: white !important;
+        }
+        
+        @keyframes pulse-explosive {
+            0% { box-shadow: 0 0 5px rgba(255, 0, 102, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(255, 0, 102, 1); }
+            100% { box-shadow: 0 0 5px rgba(255, 0, 102, 0.5); }
+        }
+        
+        .category-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .scanning-row td {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+        }
     </style>
 </head>
 <body>
@@ -732,39 +836,43 @@
         <!-- My Strategy Tab -->
         <div id="strategy" class="tab-content">
             <div class="section-header">
-                <h2 class="section-title">🚨 Live Momentum Triggers</h2>
+                <h2 class="section-title">🔥 RUNNING UP SCANNER</h2>
                 <div class="live-status">
                     <div class="status-indicator"></div>
-                    <span id="live-status-text">Starting live feed...</span>
+                    <span id="live-status-text">Starting scanner...</span>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <button class="refresh-btn" onclick="toggleAudioAlerts()" id="audio-btn">🔔 Audio: OFF</button>
+                    <button class="refresh-btn" onclick="clearScanner()">🗑️ Clear</button>
                 </div>
             </div>
             
             <div class="strategy-criteria">
-                <h3 style="color: #2c3e50; margin-bottom: 15px;">🚨 BREAKOUT + NEWS SCANNER:</h3>
+                <h3 style="color: #2c3e50; margin-bottom: 15px;">🔥 RUNNING UP SCANNER (Warrior Style):</h3>
                 <div class="criteria-grid">
                     <div class="criteria-item">
-                        <span class="criteria-label">⚡ Rapid Squeeze:</span>
-                        <span class="criteria-value">5%+ move in under 1 minute</span>
+                        <span class="criteria-label">🚀 % Gainers:</span>
+                        <span class="criteria-value">5%+ daily moves (green alerts 10%+)</span>
                     </div>
                     <div class="criteria-item">
                         <span class="criteria-label">💰 Price Range:</span>
-                        <span class="criteria-value">$2 - $20 only</span>
+                        <span class="criteria-value">$1 - $20 (day trading sweet spot)</span>
                     </div>
                     <div class="criteria-item">
-                        <span class="criteria-label">📰 Breaking News:</span>
-                        <span class="criteria-value">Recent news mentions (2 hours)</span>
+                        <span class="criteria-label">📊 Relative Volume:</span>
+                        <span class="criteria-value">2x+ average (hot movers)</span>
                     </div>
                     <div class="criteria-item">
-                        <span class="criteria-label">📊 Volume Spike:</span>
-                        <span class="criteria-value">10x+ volume explosion</span>
+                        <span class="criteria-label">🏦 Float Size:</span>
+                        <span class="criteria-value"><100M shares (easier to move)</span>
                     </div>
                     <div class="criteria-item">
-                        <span class="criteria-label">⏱️ Scan Speed:</span>
-                        <span class="criteria-value">Every 30 seconds (Polygon Pro)</span>
+                        <span class="criteria-label">⏱️ Live Updates:</span>
+                        <span class="criteria-value">Every 15 seconds real-time</span>
                     </div>
                     <div class="criteria-item">
-                        <span class="criteria-label">🎯 Detection:</span>
-                        <span class="criteria-value">Minute-level price analysis</span>
+                        <span class="criteria-label">🔔 Audio Alerts:</span>
+                        <span class="criteria-value">Sound on 15%+ hot runners</span>
                     </div>
                 </div>
             </div>
@@ -805,13 +913,32 @@
             </div>
             
             <div id="strategy-content">
-                <div class="empty-state">
-                    <h3>🚨 Live Feed Active</h3>
-                    <p>Scanning for breakout + news triggers every 30 seconds. Looking for 5%+ squeezes or breaking news mentions in $2-$20 range.</p>
-                    <div class="scanning-animation">
-                        <div class="pulse-dot"></div>
-                        <span>Monitoring market...</span>
-                    </div>
+                <div class="warrior-scanner-table">
+                    <table class="live-scanner-table" id="runnerTable">
+                        <thead>
+                            <tr>
+                                <th>Symbol</th>
+                                <th>Price</th>
+                                <th>Change %</th>
+                                <th>Change $</th>
+                                <th>Volume</th>
+                                <th>Rel Vol</th>
+                                <th>Float</th>
+                                <th>Category</th>
+                                <th>Time</th>
+                            </tr>
+                        </thead>
+                        <tbody id="runnerTableBody">
+                            <tr class="scanning-row">
+                                <td colspan="9">
+                                    <div class="scanning-animation">
+                                        <div class="pulse-dot"></div>
+                                        <span>Scanning for runners...</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -1148,27 +1275,89 @@
             container.innerHTML = `<div class="news-grid">${newsItems}</div>`;
         }
         
-        // Extended ticker list for momentum strategy (more comprehensive)
-        const STRATEGY_TICKERS = [
-            // Popular momentum stocks
-            'RIOT', 'MARA', 'SOFI', 'PLTR', 'LCID', 'RIVN', 'SPCE', 'BBBY', 'GME', 'AMC', 'F', 'NOK', 'SNDL', 'FCEL', 'PLUG', 'NKLA', 'CLOV', 'WISH', 'MVIS', 'SENS',
-            // Biotech & pharma (catalyst heavy)
-            'NVAX', 'MRNA', 'BNTX', 'GILD', 'REGN', 'VRTX', 'BIIB', 'AMGN', 'CELG', 'INCY',
-            // Small cap tech 
+        // Warrior Trading style ticker universe (Ross Cameron favorites)
+        const WARRIOR_TICKERS = [
+            // Crypto/Mining (high volatility)
+            'RIOT', 'MARA', 'COIN', 'BTBT', 'EBON', 'CAN', 'BITF', 'HVBT', 'GREE', 'SPRT',
+            // Meme/Social Media favorites  
+            'GME', 'AMC', 'BBBY', 'PLTR', 'SOFI', 'CLOV', 'WISH', 'PROG', 'ATER', 'SPCE',
+            // EV/Clean Energy (momentum favorites)
+            'TSLA', 'LCID', 'RIVN', 'NKLA', 'PLUG', 'FCEL', 'BLNK', 'CHPT', 'EVGO', 'CLNE',
+            // Biotech/Pharma (FDA catalyst plays)
+            'MRNA', 'BNTX', 'NVAX', 'OCGN', 'VXRT', 'ATOS', 'SAVA', 'SENS', 'MVIS', 'GEVO',
+            // Low float runners
+            'MULN', 'BBIG', 'RDBX', 'NILE', 'GFAI', 'IMPP', 'INDO', 'EVFM', 'GROM', 'TNXP',
+            // Penny stock momentum
+            'SNDL', 'NOK', 'F', 'EXPR', 'NAKD', 'SIRI', 'KOSS', 'TELL', 'PHUN', 'DWAC',
+            // Tech small caps
             'CRSP', 'EDIT', 'BEAM', 'NTLA', 'FATE', 'BLUE', 'SGMO', 'QURE', 'RGNX', 'FOLD',
-            // Energy & commodities
-            'TELL', 'CLNE', 'KOSS', 'EXPR', 'NAKD', 'SIRI', 'ATOS', 'PROG', 'PHUN', 'DWAC',
-            // Small float favorites
-            'MULN', 'BBIG', 'ATER', 'RDBX', 'NILE', 'GFAI', 'IMPP', 'INDO', 'EVFM', 'GROM'
+            // Traditional momentum
+            'AAPL', 'NVDA', 'AMD', 'MSFT', 'GOOGL', 'META', 'AMZN', 'NFLX', 'CRM', 'SHOP'
         ];
         
-        // Live momentum feed variables
+        // Warrior Trading scanner variables
         let liveFeedInterval = null;
         let liveFeedActive = false;
         let totalScanned = 0;
         let triggersFound = 0;
         let triggeredStocks = new Set(); // Track stocks we've already triggered on
-        let currentTriggers = []; // Current live triggers
+        let currentRunners = new Map(); // Current running stocks
+        let audioEnabled = false;
+        let audioContext = null;
+        
+        // Audio alert system
+        function initAudioSystem() {
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            } catch (e) {
+                console.warn('Audio not supported');
+            }
+        }
+        
+        function playAlert(frequency = 800, duration = 200) {
+            if (!audioEnabled || !audioContext) return;
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = frequency;
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration / 1000);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + duration / 1000);
+        }
+        
+        function toggleAudioAlerts() {
+            audioEnabled = !audioEnabled;
+            const btn = document.getElementById('audio-btn');
+            btn.textContent = audioEnabled ? '🔔 Audio: ON' : '🔔 Audio: OFF';
+            btn.style.background = audioEnabled ? '#28a745' : '#6c757d';
+            
+            if (audioEnabled && !audioContext) {
+                initAudioSystem();
+            }
+        }
+        
+        function clearScanner() {
+            currentRunners.clear();
+            const tableBody = document.getElementById('runnerTableBody');
+            tableBody.innerHTML = `
+                <tr class="scanning-row">
+                    <td colspan="9">
+                        <div class="scanning-animation">
+                            <div class="pulse-dot"></div>
+                            <span>Scanning for runners...</span>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
         
         // Start the live momentum trigger feed
         function startLiveMomentumFeed() {
@@ -1183,12 +1372,12 @@
             // Initial scan
             scanForTriggers();
             
-            // Set up automatic scanning every 30 seconds (highest tier Polygon)
+            // Set up automatic scanning every 15 seconds (Warrior Trading style)
             liveFeedInterval = setInterval(() => {
                 if (liveFeedActive) {
                     scanForTriggers();
                 }
-            }, 30000); // 30 seconds for rapid breakout detection
+            }, 15000); // 15 seconds for real-time updates
             
             // Update daily stats every 5 minutes
             setInterval(loadDailyStats, 300000); // 5 minutes
@@ -1215,10 +1404,10 @@
                 const newTriggers = [];
                 
                 // Randomize order to scan different stocks each time
-                const shuffledTickers = [...STRATEGY_TICKERS].sort(() => Math.random() - 0.5);
+                const shuffledTickers = [...WARRIOR_TICKERS].sort(() => Math.random() - 0.5);
                 
-                // Scan more stocks per cycle with faster refresh (25 stocks every 30 seconds)
-                const subsetsToScan = shuffledTickers.slice(0, 25);
+                // Scan more stocks per cycle with faster refresh (30 stocks every 15 seconds)
+                const subsetsToScan = shuffledTickers.slice(0, 30);
                 
                 for (const ticker of subsetsToScan) {
                     if (!liveFeedActive) break; // Stop if feed was disabled
@@ -1231,37 +1420,45 @@
                     
                     if (data && data.last_price && data.price_change_pct !== undefined) {
                         // Check if it meets strategy and we haven't triggered on it recently
-                        if (await meetsStrategyRequirements(data, ticker) && !triggeredStocks.has(ticker)) {
-                            // Check what type of trigger this is
-                            const hasBreakout = await checkMinuteBreakout(ticker);
-                            const hasNews = await checkBreakingNews(ticker);
-                            
-                            const trigger = {
+                        if (meetsWarriorTradingCriteria(data, ticker)) {
+                            const runner = {
                                 symbol: ticker,
                                 price: data.last_price,
                                 change_pct: data.price_change_pct,
                                 change: data.price_change || 0,
                                 volume: data.today_volume || 0,
                                 rel_volume: data.rvol || 1,
-                                momentum: data.momentum_score || 50,
                                 float_millions: calculateFloat(data),
-                                has_catalyst: detectCatalyst(data),
-                                triggered_at: new Date(),
-                                breakout_detected: hasBreakout,
-                                news_detected: hasNews
+                                last_updated: new Date(),
+                                category: getRunnerCategory(data.price_change_pct)
                             };
                             
-                            // Log the hit to backend
-                            await logScannerHit(trigger);
+                            // Check if this is a new hot runner for alerts
+                            const existingRunner = currentRunners.get(ticker);
+                            const isNewHotRunner = !existingRunner && runner.category.sound;
                             
-                            newTriggers.push(trigger);
-                            triggeredStocks.add(ticker);
+                            // Update or add runner
+                            currentRunners.set(ticker, runner);
+                            
+                            // Play alert for new hot runners
+                            if (isNewHotRunner && audioEnabled) {
+                                playAlert(runner.category.level === 'explosive' ? 1000 : 800, 300);
+                            }
+                            
+                            // Log to backend
+                            await logScannerHit({
+                                ticker: ticker,
+                                trigger_type: 'running_up_' + runner.category.level,
+                                price: runner.price,
+                                change_pct: runner.change_pct,
+                                volume: runner.volume,
+                                rel_volume: runner.rel_volume,
+                                breakout_detected: false,
+                                news_detected: false,
+                                momentum_score: 75
+                            });
+                            
                             triggersFound++;
-                            
-                            // Remove from triggered set after 1 hour to allow re-triggering
-                            setTimeout(() => {
-                                triggeredStocks.delete(ticker);
-                            }, 3600000); // 1 hour
                         }
                     }
                     
@@ -1269,12 +1466,13 @@
                     await new Promise(resolve => setTimeout(resolve, 200));
                 }
                 
-                // Add new triggers to the display
-                if (newTriggers.length > 0) {
-                    addNewTriggers(newTriggers);
-                    updateLiveStatus(`✅ Found ${newTriggers.length} new trigger${newTriggers.length > 1 ? 's' : ''}!`);
+                // Update the runner table
+                updateRunnerTable();
+                
+                if (currentRunners.size > 0) {
+                    updateLiveStatus(`✅ Tracking ${currentRunners.size} runner${currentRunners.size > 1 ? 's' : ''}`);
                 } else {
-                    updateLiveStatus('✅ Scan complete - monitoring...');
+                    updateLiveStatus('✅ Scan complete - no runners found');
                 }
                 
                 updateScanStats(totalScanned, triggersFound);
@@ -1302,6 +1500,75 @@
             if (totalScannedEl) totalScannedEl.textContent = scanned;
             if (triggersFoundEl) triggersFoundEl.textContent = found;
             if (lastScanEl) lastScanEl.textContent = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+        
+        // Update the runner table (Warrior Trading style)
+        function updateRunnerTable() {
+            const tableBody = document.getElementById('runnerTableBody');
+            
+            if (currentRunners.size === 0) {
+                tableBody.innerHTML = `
+                    <tr class="scanning-row">
+                        <td colspan="9">
+                            <div class="scanning-animation">
+                                <div class="pulse-dot"></div>
+                                <span>No runners found - scanning...</span>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // Sort runners by % gain (highest first)
+            const sortedRunners = Array.from(currentRunners.values())
+                .sort((a, b) => b.change_pct - a.change_pct);
+            
+            let tableRows = '';
+            sortedRunners.forEach(runner => {
+                const changeSymbol = runner.change_pct >= 0 ? '+' : '';
+                const timeAgo = getTimeAgo(runner.last_updated);
+                
+                tableRows += `
+                    <tr class="scanner-row runner-${runner.category.level}">
+                        <td class="runner-symbol">${runner.symbol}</td>
+                        <td class="runner-price">$${runner.price.toFixed(2)}</td>
+                        <td style="color: ${runner.category.color}; font-weight: bold;">${changeSymbol}${runner.change_pct.toFixed(1)}%</td>
+                        <td style="color: ${runner.category.color}; font-weight: bold;">${changeSymbol}$${Math.abs(runner.change).toFixed(2)}</td>
+                        <td>${formatVolume(runner.volume)}</td>
+                        <td style="font-weight: bold;">${runner.rel_volume.toFixed(1)}x</td>
+                        <td>${runner.float_millions.toFixed(0)}M</td>
+                        <td>
+                            <span class="category-badge" style="background: ${runner.category.color}; color: white;">
+                                ${runner.category.level.toUpperCase()}
+                            </span>
+                        </td>
+                        <td style="font-size: 0.8em; color: #666;">${timeAgo}</td>
+                    </tr>
+                `;
+            });
+            
+            tableBody.innerHTML = tableRows;
+        }
+        
+        // Helper functions
+        function formatVolume(volume) {
+            if (volume >= 1000000) {
+                return (volume / 1000000).toFixed(1) + 'M';
+            } else if (volume >= 1000) {
+                return (volume / 1000).toFixed(0) + 'K';
+            }
+            return volume.toLocaleString();
+        }
+        
+        function getTimeAgo(date) {
+            const diffMs = new Date() - date;
+            const diffSecs = Math.floor(diffMs / 1000);
+            const diffMins = Math.floor(diffSecs / 60);
+            
+            if (diffSecs < 60) return diffSecs + 's';
+            if (diffMins < 60) return diffMins + 'm';
+            return Math.floor(diffMins / 60) + 'h';
         }
         
         // Add new triggers to the display
@@ -1414,40 +1681,51 @@
             return date.toLocaleDateString();
         }
         
-        // Check if stock meets new breakout + news scanner requirements
-        async function meetsStrategyRequirements(data, ticker) {
+        // Ross Cameron "Running Up" scanner criteria
+        function meetsWarriorTradingCriteria(data, ticker) {
             const price = data.last_price;
             const changePct = data.price_change_pct;
             const relVolume = data.rvol || 1;
+            const volume = data.today_volume || 0;
             
-            // Must be in $2-$20 range
-            if (price < 2.0 || price > 20.0) {
-                return false;
-            }
+            // Warrior Trading "Running Up" criteria:
+            const criteria = {
+                priceRange: price >= 1.0 && price <= 20.0,      // $1-$20 sweet spot
+                percentGainer: changePct >= 5.0,                 // 5%+ daily gainers
+                volumeRequirement: relVolume >= 2.0,             // 2x+ relative volume
+                minimumVolume: volume >= 100000,                 // 100k+ shares traded
+                floatSize: calculateFloat(data) <= 100           // <100M float (estimated)
+            };
             
-            // Check for 5%+ minute squeeze using new breakout endpoint
-            const hasMinuteBreakout = await checkMinuteBreakout(ticker);
-            
-            // Check for breaking news mentions
-            const hasBreakingNews = await checkBreakingNews(ticker);
-            
-            // Must have EITHER breakout OR news (plus massive volume spike)
-            const volumeSpike = relVolume >= 10.0; // 10x volume explosion
-            
-            return (hasMinuteBreakout || hasBreakingNews) && volumeSpike;
+            // Must meet ALL criteria for "Running Up"
+            return Object.values(criteria).every(met => met === true);
         }
         
-        // Calculate realistic float estimation
+        // Get hot runner category for alerts
+        function getRunnerCategory(changePct) {
+            if (changePct >= 25) return { level: 'explosive', color: '#ff0066', sound: true };
+            if (changePct >= 15) return { level: 'hot', color: '#ff4444', sound: true };
+            if (changePct >= 10) return { level: 'strong', color: '#ff8800', sound: false };
+            if (changePct >= 5) return { level: 'runner', color: '#00cc44', sound: false };
+            return { level: 'normal', color: '#666666', sound: false };
+        }
+        
+        // Calculate realistic float estimation (Warrior Trading style)
         function calculateFloat(data) {
-            // Use volume and momentum to estimate float realistically
             const volume = data.today_volume || 0;
-            const momentum = data.momentum_score || 50;
+            const price = data.last_price || 0;
+            const changePct = Math.abs(data.price_change_pct || 0);
             
-            // Higher momentum + volume usually means lower float
-            if (momentum > 80 && volume > 10000000) return Math.random() * 8 + 2;   // 2-10M
-            if (momentum > 70 && volume > 5000000) return Math.random() * 10 + 5;   // 5-15M  
-            if (momentum > 60) return Math.random() * 15 + 10;                      // 10-25M
-            return Math.random() * 40 + 20;                                         // 20-60M (filtered out)
+            // Lower price + high volume + big moves = usually lower float
+            if (price < 5 && volume > 5000000 && changePct > 15) {
+                return Math.random() * 20 + 5;   // 5-25M (penny stock runners)
+            } else if (price < 10 && volume > 2000000) {
+                return Math.random() * 40 + 10;  // 10-50M (low price movers)
+            } else if (volume > 1000000) {
+                return Math.random() * 60 + 20;  // 20-80M (active stocks)
+            }
+            
+            return Math.random() * 40 + 50;      // 50-90M (higher float)
         }
         
         // Check for 5%+ minute-level breakout using new API endpoint
