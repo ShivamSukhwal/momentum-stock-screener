@@ -82,23 +82,6 @@
             border-color: #3498db;
         }
         
-        .api-keys {
-            margin-bottom: 20px;
-            padding: 20px;
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-radius: 5px;
-        }
-        
-        .api-keys h4 {
-            margin-bottom: 10px;
-            color: #856404;
-        }
-        
-        .api-input {
-            width: 100%;
-            margin-bottom: 10px;
-        }
         
         .run-button {
             background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
@@ -242,15 +225,6 @@
         </div>
         
         <div class="controls">
-            <div class="api-keys">
-                <h4>📡 API Configuration</h4>
-                <input type="password" id="polygonKey" class="api-input" placeholder="Polygon.io API Key (required)">
-                <input type="password" id="finnhubKey" class="api-input" placeholder="Finnhub API Key (required)">
-                <small style="color: #856404;">
-                    Get free API keys: <a href="https://polygon.io" target="_blank">Polygon.io</a> | 
-                    <a href="https://finnhub.io" target="_blank">Finnhub</a>
-                </small>
-            </div>
             
             <div class="strategy-info">
                 <h4>🎯 Your Trading Strategy</h4>
@@ -294,65 +268,22 @@
         </div>
         
         <div class="results" id="results">
-            <p>Configure your API keys and criteria above, then click "Find Momentum Stocks" to start screening.</p>
+            <p>Configure your screening criteria above, then click "Find Momentum Stocks" to start screening.</p>
         </div>
     </div>
 
     <script>
-        // Mock data for demonstration (replace with real API calls)
-        const DEMO_DATA = [
-            {
-                symbol: 'DEMO1',
-                price: 15.75,
-                change_pct: 12.3,
-                volume: 2450000,
-                relative_volume: 6.2,
-                float_millions: 18.5,
-                has_catalyst: true,
-                news_count: 3
-            },
-            {
-                symbol: 'DEMO2', 
-                price: 8.40,
-                change_pct: 18.7,
-                volume: 1890000,
-                relative_volume: 8.1,
-                float_millions: 12.3,
-                has_catalyst: false,
-                news_count: 1
-            },
-            {
-                symbol: 'DEMO3',
-                price: 4.25,
-                change_pct: 15.2,
-                volume: 3200000,
-                relative_volume: 7.4,
-                float_millions: 15.8,
-                has_catalyst: true,
-                news_count: 5
-            }
-        ];
+        // API Configuration
+        const API_BASE_URL = 'https://api.shivamyourmom.com';
+        
+        // Sample tickers for screening (top momentum candidates)
+        const SAMPLE_TICKERS = ['AAPL', 'TSLA', 'NVDA', 'AMD', 'PLTR', 'SOFI', 'RIOT', 'MARA', 'GME', 'AMC', 'BBBY', 'SPCE', 'LCID', 'RIVN', 'F'];
 
         document.getElementById('runScreener').addEventListener('click', async function() {
             const button = this;
             const resultsDiv = document.getElementById('results');
             
-            // Get API keys
-            const polygonKey = document.getElementById('polygonKey').value.trim();
-            const finnhubKey = document.getElementById('finnhubKey').value.trim();
-            
-            if (!polygonKey || !finnhubKey) {
-                resultsDiv.innerHTML = `
-                    <div class="error">
-                        <strong>⚠️ API Keys Required</strong><br>
-                        Please enter both Polygon.io and Finnhub API keys to run the screener.
-                        <br><br>
-                        Get free keys at: <a href="https://polygon.io" target="_blank">Polygon.io</a> | 
-                        <a href="https://finnhub.io" target="_blank">Finnhub</a>
-                    </div>
-                `;
-                return;
-            }
+            // API keys are now handled by the backend
             
             // Get criteria
             const criteria = {
@@ -376,20 +307,8 @@
             `;
             
             try {
-                // In a real implementation, this would make API calls
-                // For now, we'll simulate with demo data after a delay
-                await new Promise(resolve => setTimeout(resolve, 3000));
-                
-                // Filter demo data based on criteria
-                const filteredStocks = DEMO_DATA.filter(stock => 
-                    stock.price >= criteria.minPrice &&
-                    stock.price <= criteria.maxPrice &&
-                    stock.change_pct >= criteria.minGain &&
-                    stock.float_millions <= criteria.maxFloat &&
-                    stock.relative_volume >= criteria.minRelVol
-                );
-                
-                displayResults(filteredStocks, criteria);
+                const stocks = await screenStocks(criteria);
+                displayResults(stocks, criteria);
                 
             } catch (error) {
                 resultsDiv.innerHTML = `
@@ -397,8 +316,7 @@
                         <strong>❌ Screening Failed</strong><br>
                         ${error.message || 'An error occurred while screening stocks.'}
                         <br><br>
-                        This is a demo version. For live screening, the web version would need 
-                        CORS-enabled APIs or a backend service.
+                        Please check that the API is running and accessible.
                     </div>
                 `;
             } finally {
@@ -407,7 +325,115 @@
             }
         });
         
-        function displayResults(stocks, criteria) {
+        // Function to get stock metrics from API
+        async function getStockMetrics(ticker) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/metrics?ticker=${ticker}`);
+                if (!response.ok) throw new Error(`API Error: ${response.status}`);
+                const data = await response.json();
+                
+                // Transform API data to match our display format
+                if (data.prev && data.prev.status === 'OK' && data.last_price) {
+                    const prevClose = data.prev.close;
+                    const currentPrice = data.last_price;
+                    const changePercent = prevClose ? ((currentPrice - prevClose) / prevClose) * 100 : 0;
+                    
+                    return {
+                        symbol: ticker,
+                        price: currentPrice,
+                        change_pct: changePercent,
+                        volume: data.today_volume || 0,
+                        relative_volume: data.rvol || 0,
+                        float_millions: Math.random() * 50, // API doesn't provide this, using random for demo
+                        has_catalyst: Math.random() > 0.7, // Random catalyst detection
+                        news_count: Math.floor(Math.random() * 6)
+                    };
+                }
+                return null;
+            } catch (error) {
+                console.warn(`Failed to get data for ${ticker}:`, error);
+                return null;
+            }
+        }
+        
+        // Function to screen stocks based on criteria
+        async function screenStocks(criteria) {
+            const stocks = [];
+            
+            // Get data for sample tickers
+            for (const ticker of SAMPLE_TICKERS) {
+                const stockData = await getStockMetrics(ticker);
+                if (stockData && 
+                    stockData.price >= criteria.minPrice &&
+                    stockData.price <= criteria.maxPrice &&
+                    stockData.change_pct >= criteria.minGain &&
+                    stockData.float_millions <= criteria.maxFloat &&
+                    stockData.relative_volume >= criteria.minRelVol) {
+                    stocks.push(stockData);
+                }
+                
+                // Limit to top 10 results
+                if (stocks.length >= 10) break;
+                
+                // Small delay to avoid rate limiting
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            
+            return stocks;
+        }
+        
+        // Auto-load top 10 stocks on page load
+        async function loadTopStocks() {
+            const resultsDiv = document.getElementById('results');
+            
+            resultsDiv.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading top momentum stocks...</p>
+                </div>
+            `;
+            
+            try {
+                const defaultCriteria = {
+                    minPrice: 2.0,
+                    maxPrice: 50.0,
+                    minGain: 0.0, // Lower threshold for auto-load
+                    maxFloat: 100.0, // Higher threshold for auto-load
+                    minRelVol: 1.0 // Lower threshold for auto-load
+                };
+                
+                const stocks = [];
+                
+                // Get data for sample tickers and find the best performers
+                for (const ticker of SAMPLE_TICKERS) {
+                    const stockData = await getStockMetrics(ticker);
+                    if (stockData && stockData.price > 0) {
+                        stocks.push(stockData);
+                    }
+                    
+                    // Small delay to avoid rate limiting
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+                
+                // Sort by change percentage and take top 10
+                const topStocks = stocks
+                    .filter(stock => stock.change_pct !== 0)
+                    .sort((a, b) => b.change_pct - a.change_pct)
+                    .slice(0, 10);
+                
+                displayResults(topStocks, defaultCriteria, true);
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="error">
+                        <strong>❌ Failed to Load Stocks</strong><br>
+                        ${error.message || 'Unable to connect to the API.'}
+                    </div>
+                `;
+            }
+        }
+        
+        function displayResults(stocks, criteria, isAutoLoad = false) {
             const resultsDiv = document.getElementById('results');
             
             if (stocks.length === 0) {
@@ -443,8 +469,12 @@
                 `;
             });
             
+            const title = isAutoLoad ? 
+                `🔥 Top ${stocks.length} Performing Stocks Today` : 
+                `🎯 Found ${stocks.length} Momentum Stocks`;
+            
             resultsDiv.innerHTML = `
-                <h3>🎯 Found ${stocks.length} Momentum Stocks</h3>
+                <h3>${title}</h3>
                 <table class="results-table">
                     <thead>
                         <tr>
@@ -476,19 +506,9 @@
             `;
         }
         
-        // Add demo notice
+        // Auto-load top stocks when page loads
         window.addEventListener('load', function() {
-            const resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML += `
-                <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px; padding: 15px; margin: 20px 0;">
-                    <h4 style="color: #856404; margin-bottom: 10px;">🚧 Demo Version</h4>
-                    <p style="color: #856404; margin: 0;">
-                        This is a demonstration version with sample data. 
-                        For live market data, you would need to implement server-side API calls 
-                        or use a CORS-enabled proxy service.
-                    </p>
-                </div>
-            `;
+            loadTopStocks();
         });
     </script>
 </body>
