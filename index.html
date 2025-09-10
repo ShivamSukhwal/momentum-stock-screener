@@ -912,11 +912,7 @@
                     <span class="stat-value" id="daily-hits">--</span>
                     <span class="stat-label">Today's Total</span>
                 </div>
-                <div class="stat-item">
-                    <span class="stat-value" id="unique-tickers">--</span>
-                    <span class="stat-label">Unique Stocks</span>
-                </div>
-                <div class="stat-item" style="cursor: pointer;" onclick="showDailySummary()">
+                <div class="stat-item" style="cursor: pointer;" onclick="openDailyLog()">
                     <span class="stat-value">📊</span>
                     <span class="stat-label">View Daily Log</span>
                 </div>
@@ -2359,10 +2355,8 @@
                     const data = await response.json();
                     
                     const dailyHitsEl = document.getElementById('daily-hits');
-                    const uniqueTickersEl = document.getElementById('unique-tickers');
                     
                     if (dailyHitsEl) dailyHitsEl.textContent = data.total_hits || 0;
-                    if (uniqueTickersEl) uniqueTickersEl.textContent = data.unique_tickers || 0;
                 }
             } catch (error) {
                 console.warn('Failed to load daily stats:', error);
@@ -2413,6 +2407,11 @@
             } catch (error) {
                 alert('Error loading daily summary: ' + error.message);
             }
+        }
+        
+        // Open daily log page
+        function openDailyLog() {
+            window.open('daily-log.html', '_blank');
         }
         
         // Export data for ChatGPT analysis

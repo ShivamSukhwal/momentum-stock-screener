@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Trading Log - Stock Scanner Data</title>
+    <meta name="description" content="Daily stock scanner log with momentum stocks, triggers, and trading data">
+    <meta name="keywords" content="stock trading, momentum stocks, day trading, scanner data, triggers">
+    <meta name="robots" content="index, follow">
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #ffffff;
+            padding: 20px;
+            margin: 0;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(0,0,0,0.8);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #00ff00;
+            padding-bottom: 20px;
+        }
+        .header h1 {
+            color: #00ff00;
+            font-size: 2.5em;
+            margin: 0;
+            text-shadow: 0 0 10px #00ff00;
+        }
+        .metadata {
+            background: #001100;
+            border: 1px solid #00ff00;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            font-size: 0.9em;
+        }
+        .section {
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(0,20,0,0.5);
+            border-left: 4px solid #00ff00;
+            border-radius: 8px;
+        }
+        .section-title {
+            color: #ffff00;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        .log-entry {
+            background: rgba(0,50,0,0.3);
+            border: 1px solid #004400;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 3px solid #00ff00;
+        }
+        .stock-symbol {
+            color: #00ffff;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .timestamp {
+            color: #888;
+            font-size: 0.9em;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-box {
+            background: rgba(0,100,0,0.2);
+            border: 1px solid #00ff00;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+        .stat-value {
+            color: #00ff00;
+            font-size: 2em;
+            font-weight: bold;
+            display: block;
+        }
+        .stat-label {
+            color: #cccccc;
+            font-size: 0.9em;
+        }
+        .loading {
+            text-align: center;
+            color: #ffff00;
+            font-size: 1.2em;
+            margin: 50px 0;
+        }
+        .error {
+            background: rgba(100,0,0,0.3);
+            border: 1px solid #ff4444;
+            color: #ff4444;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .category-explosive { border-left-color: #ff0066; }
+        .category-hot { border-left-color: #ff4444; }
+        .category-strong { border-left-color: #ff8800; }
+        .category-runner { border-left-color: #00cc44; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 DAILY TRADING LOG</h1>
+            <p class="timestamp">Generated: <span id="currentTime">Loading...</span></p>
+        </div>
+
+        <!-- Metadata for AI/ChatGPT Scraping -->
+        <div class="metadata">
+            <h3>🤖 METADATA FOR AI ANALYSIS</h3>
+            <div id="metadata">
+                DATA_TYPE: stock_scanner_daily_log<br>
+                MARKET: NYSE_NASDAQ<br>
+                TIMEZONE: Eastern_Time<br>
+                SCANNER_TYPE: momentum_trading<br>
+                UPDATE_FREQUENCY: 15_seconds<br>
+                DATA_SOURCE: live_market_feed<br>
+                LAST_UPDATED: <span id="lastUpdated">loading...</span><br>
+                TOTAL_ENTRIES: <span id="totalEntries">0</span><br>
+                MARKET_STATUS: <span id="marketStatus">unknown</span>
+            </div>
+        </div>
+
+        <!-- Daily Statistics -->
+        <div class="section">
+            <div class="section-title">📈 TODAY'S SCANNER STATISTICS</div>
+            <div class="stats-grid" id="dailyStats">
+                <div class="loading">Loading daily statistics...</div>
+            </div>
+        </div>
+
+        <!-- Active Triggers -->
+        <div class="section">
+            <div class="section-title">🚨 CURRENT MOMENTUM STOCKS</div>
+            <div id="activeTriggers">
+                <div class="loading">Loading active triggers...</div>
+            </div>
+        </div>
+
+        <!-- Recent Activity Log -->
+        <div class="section">
+            <div class="section-title">📝 RECENT SCANNER ACTIVITY</div>
+            <div id="recentActivity">
+                <div class="loading">Loading recent activity...</div>
+            </div>
+        </div>
+
+        <!-- Breaking News -->
+        <div class="section">
+            <div class="section-title">📰 MARKET NEWS FEED</div>
+            <div id="marketNews">
+                <div class="loading">Loading market news...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'https://shivamyourmom.com/api';
+        
+        // Update every 60 seconds
+        setInterval(loadAllData, 60000);
+        loadAllData(); // Initial load
+        
+        async function loadAllData() {
+            updateTimestamp();
+            await Promise.all([
+                loadDailyStats(),
+                loadActiveTriggers(),
+                loadRecentActivity(),
+                loadMarketNews()
+            ]);
+            updateMetadata();
+        }
+        
+        function updateTimestamp() {
+            document.getElementById('currentTime').textContent = new Date().toLocaleString();
+            document.getElementById('lastUpdated').textContent = new Date().toISOString();
+        }
+        
+        function getMarketStatus() {
+            const now = new Date();
+            const et = new Date(now.toLocaleString("en-US", {timeZone: "America/New_York"}));
+            const day = et.getDay();
+            const hour = et.getHours();
+            const minute = et.getMinutes();
+            const time = hour * 100 + minute;
+            
+            if (day === 0 || day === 6) return 'CLOSED';
+            if (time >= 400 && time < 930) return 'PRE_MARKET';
+            if (time >= 930 && time < 1600) return 'OPEN';
+            if (time >= 1600 && time < 2000) return 'AFTER_HOURS';
+            return 'CLOSED';
+        }
+        
+        function updateMetadata() {
+            document.getElementById('marketStatus').textContent = getMarketStatus();
+            
+            const savedData = localStorage.getItem('warriorScannerData');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                document.getElementById('totalEntries').textContent = data.runnerHistory ? data.runnerHistory.length : 0;
+            }
+        }
+        
+        async function loadDailyStats() {
+            const container = document.getElementById('dailyStats');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/daily-summary`, {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' },
+                    mode: 'cors'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    container.innerHTML = `
+                        <div class="stat-box">
+                            <span class="stat-value">${data.total_hits || 0}</span>
+                            <span class="stat-label">Total Triggers</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-value">${data.unique_tickers || 0}</span>
+                            <span class="stat-label">Unique Stocks</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-value">${getMarketStatus()}</span>
+                            <span class="stat-label">Market Status</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-value">${new Date().toLocaleDateString()}</span>
+                            <span class="stat-label">Trading Date</span>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = '<div class="error">Unable to load daily statistics</div>';
+                }
+            } catch (error) {
+                container.innerHTML = '<div class="error">Daily statistics service unavailable</div>';
+            }
+        }
+        
+        async function loadActiveTriggers() {
+            const container = document.getElementById('activeTriggers');
+            
+            const savedData = localStorage.getItem('warriorScannerData');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                const runners = data.runnerHistory || [];
+                
+                if (runners.length === 0) {
+                    container.innerHTML = '<div class="log-entry">No active momentum stocks found</div>';
+                    return;
+                }
+                
+                let output = '';
+                runners.slice(0, 20).forEach(runner => {
+                    const timestamp = new Date(runner.last_updated).toLocaleString();
+                    const changeSymbol = runner.change_pct >= 0 ? '+' : '';
+                    
+                    output += `
+                        <div class="log-entry category-${runner.category.level}">
+                            <div class="stock-symbol">${runner.symbol}</div>
+                            PRICE: $${runner.price.toFixed(2)} | 
+                            CHANGE: ${changeSymbol}${runner.change_pct.toFixed(2)}% | 
+                            VOLUME: ${formatVolume(runner.volume)} | 
+                            CATEGORY: ${runner.category.level.toUpperCase()} | 
+                            <span class="timestamp">TIME: ${timestamp}</span>
+                            ${runner.news_url ? ' | 📰 HAS_NEWS' : ''}
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = output;
+            } else {
+                container.innerHTML = '<div class="error">No scanner data available</div>';
+            }
+        }
+        
+        async function loadRecentActivity() {
+            const container = document.getElementById('recentActivity');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/daily-summary`, {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' },
+                    mode: 'cors'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    if (data.scanner_hits && data.scanner_hits.length > 0) {
+                        let output = '';
+                        data.scanner_hits.slice(-10).forEach(hit => {
+                            const time = new Date(hit.timestamp).toLocaleString();
+                            const trigger = hit.trigger_analysis?.primary_trigger || 'momentum';
+                            
+                            output += `
+                                <div class="log-entry">
+                                    <div class="stock-symbol">${hit.stock_data?.ticker || 'UNKNOWN'}</div>
+                                    TRIGGER: ${trigger.toUpperCase()} | 
+                                    PRICE: $${hit.stock_data?.price || 'N/A'} | 
+                                    <span class="timestamp">TIME: ${time}</span>
+                                </div>
+                            `;
+                        });
+                        container.innerHTML = output;
+                    } else {
+                        container.innerHTML = '<div class="log-entry">No recent scanner activity found</div>';
+                    }
+                } else {
+                    container.innerHTML = '<div class="error">Unable to load recent activity</div>';
+                }
+            } catch (error) {
+                container.innerHTML = '<div class="error">Activity log service unavailable</div>';
+            }
+        }
+        
+        async function loadMarketNews() {
+            const container = document.getElementById('marketNews');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/recent-news`, {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' },
+                    mode: 'cors'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const newsArray = data.recent_news || [];
+                    
+                    if (newsArray.length === 0) {
+                        container.innerHTML = '<div class="log-entry">No recent market news found</div>';
+                        return;
+                    }
+                    
+                    let output = '';
+                    newsArray.slice(0, 10).forEach(item => {
+                        const newsTime = new Date(item.datetime).toLocaleString();
+                        
+                        output += `
+                            <div class="log-entry">
+                                <strong>${item.headline}</strong><br>
+                                SOURCE: ${item.source} | 
+                                <span class="timestamp">TIME: ${newsTime}</span><br>
+                                SUMMARY: ${item.summary.substring(0, 200)}...
+                            </div>
+                        `;
+                    });
+                    
+                    container.innerHTML = output;
+                } else {
+                    container.innerHTML = '<div class="error">Unable to load market news</div>';
+                }
+            } catch (error) {
+                container.innerHTML = '<div class="error">Market news service unavailable</div>';
+            }
+        }
+        
+        function formatVolume(volume) {
+            if (!volume) return 'N/A';
+            if (volume >= 1000000) {
+                return (volume / 1000000).toFixed(1) + 'M';
+            } else if (volume >= 1000) {
+                return (volume / 1000).toFixed(0) + 'K';
+            }
+            return volume.toString();
+        }
+    </script>
+</body>
+</html>
