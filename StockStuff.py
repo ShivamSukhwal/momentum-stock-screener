@@ -1,10 +1,12 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import requests, os, datetime, time
 from dotenv import load_dotenv
 
 load_dotenv()
 
 app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
 
 POLYGON_API_KEY = os.getenv("POLYGON_API_KEY")
 FINNHUB_API_KEY = os.getenv("FINNHUB_API_KEY")

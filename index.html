@@ -597,11 +597,24 @@
         // Get stock data from API
         async function getStockData(ticker) {
             try {
-                const response = await fetch(`${API_BASE_URL}/metrics?ticker=${ticker}`);
-                if (!response.ok) throw new Error(`API Error: ${response.status}`);
-                return await response.json();
+                const response = await fetch(`${API_BASE_URL}/metrics?ticker=${ticker}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    mode: 'cors'
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                return data;
+                
             } catch (error) {
-                console.warn(`Failed to get data for ${ticker}:`, error);
+                console.warn(`Failed to get data for ${ticker}:`, error.message);
                 return null;
             }
         }
@@ -762,7 +775,11 @@
             `;
             
             try {
-                const response = await fetch(`${API_BASE_URL}/news`);
+                const response = await fetch(`${API_BASE_URL}/news`, {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' },
+                    mode: 'cors'
+                });
                 if (!response.ok) throw new Error(`News API Error: ${response.status}`);
                 const newsData = await response.json();
                 
@@ -876,8 +893,16 @@
             try {
                 // Get both metrics and quote data
                 const [metricsResponse, quoteResponse] = await Promise.all([
-                    fetch(`${API_BASE_URL}/metrics?ticker=${ticker}`),
-                    fetch(`${API_BASE_URL}/quote?ticker=${ticker}`)
+                    fetch(`${API_BASE_URL}/metrics?ticker=${ticker}`, {
+                        method: 'GET',
+                        headers: { 'Accept': 'application/json' },
+                        mode: 'cors'
+                    }),
+                    fetch(`${API_BASE_URL}/quote?ticker=${ticker}`, {
+                        method: 'GET',
+                        headers: { 'Accept': 'application/json' },
+                        mode: 'cors'
+                    })
                 ]);
                 
                 if (!metricsResponse.ok || !quoteResponse.ok) {
