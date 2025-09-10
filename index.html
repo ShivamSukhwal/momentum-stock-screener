@@ -750,6 +750,22 @@
             font-size: 0.8em;
         }
         
+        .new-move {
+            border-left: 4px solid #ffd700 !important;
+            animation: highlightNewMove 2s ease-out;
+        }
+        
+        @keyframes highlightNewMove {
+            0% { background-color: #fff9c4; }
+            100% { background-color: transparent; }
+        }
+        
+        .move-indicator {
+            color: #ffd700;
+            font-weight: bold;
+            margin-left: 4px;
+        }
+        
         .live-scanner-table tbody tr {
             transition: all 0.3s ease;
         }
@@ -1345,8 +1361,14 @@
         let triggersFound = 0;
         let triggeredStocks = new Set(); // Track stocks we've already triggered on
         let currentRunners = new Map(); // Current running stocks
+        let runnerHistory = []; // All runner entries (including duplicates for price changes)
+        let priceHistory = new Map(); // Track last known prices
         let audioEnabled = false;
         let audioContext = null;
+        
+        // Price change thresholds for new entries
+        const PRICE_CHANGE_THRESHOLD = 1.0; // 1% additional change triggers new entry
+        const MAX_ENTRIES_PER_STOCK = 5; // Maximum entries per stock to prevent spam
         
         // Audio alert system
         function initAudioSystem() {
@@ -1389,6 +1411,8 @@
         
         function clearScanner() {
             currentRunners.clear();
+            runnerHistory = [];
+            priceHistory.clear();
             const tableBody = document.getElementById('runnerTableBody');
             tableBody.innerHTML = `
                 <tr class="scanning-row">
@@ -1400,6 +1424,39 @@
                     </td>
                 </tr>
             `;
+        }
+        
+        // Check if we should add a new entry for price movement
+        function checkForNewEntry(ticker, currentChangePct) {
+            const lastEntry = priceHistory.get(ticker);
+            
+            // Always add first entry for this stock
+            if (!lastEntry) {
+                return 'first_entry';
+            }
+            
+            // Check how many entries we already have for this stock
+            const existingEntries = runnerHistory.filter(entry => entry.symbol === ticker).length;
+            if (existingEntries >= MAX_ENTRIES_PER_STOCK) {
+                return false;
+            }
+            
+            // Check if price movement is significant enough
+            const lastChangePct = lastEntry.change_pct;
+            const changeDifference = Math.abs(currentChangePct - lastChangePct);
+            
+            // Add new entry if:
+            // 1. Stock moved an additional 1%+ from last entry
+            // 2. OR if it's been more than 5 minutes since last entry
+            const timeDifference = (new Date() - lastEntry.timestamp) / (1000 * 60); // minutes
+            
+            if (changeDifference >= PRICE_CHANGE_THRESHOLD) {
+                return 'new_move';
+            } else if (timeDifference >= 5) {
+                return 'time_update';
+            }
+            
+            return false;
         }
         
         // Start the live momentum trigger feed
@@ -1464,49 +1521,75 @@
                     if (data && data.last_price && data.price_change_pct !== undefined) {
                         // Check if it meets strategy and we haven't triggered on it recently
                         if (meetsWarriorTradingCriteria(data, ticker)) {
-                            // Check for breaking news
-                            const newsData = await checkBreakingNews(ticker);
+                            const currentPrice = data.last_price;
+                            const currentChangePct = data.price_change_pct;
                             
-                            const runner = {
-                                symbol: ticker,
-                                price: data.last_price,
-                                change_pct: data.price_change_pct,
-                                change: data.price_change || 0,
-                                volume: data.today_volume || 0,
-                                rel_volume: data.rvol || 1,
-                                float_millions: calculateFloat(data),
-                                last_updated: new Date(),
-                                category: getRunnerCategory(data.price_change_pct),
-                                news_url: newsData ? getNewsUrl(newsData, ticker) : null,
-                                has_news: newsData
-                            };
+                            // Check if this is a significant price movement from last entry
+                            const shouldAddNewEntry = checkForNewEntry(ticker, currentChangePct);
                             
-                            // Check if this is a new hot runner for alerts
-                            const existingRunner = currentRunners.get(ticker);
-                            const isNewHotRunner = !existingRunner && runner.category.sound;
-                            
-                            // Update or add runner
-                            currentRunners.set(ticker, runner);
-                            
-                            // Play alert for new hot runners
-                            if (isNewHotRunner && audioEnabled) {
-                                playAlert(runner.category.level === 'explosive' ? 1000 : 800, 300);
+                            if (shouldAddNewEntry) {
+                                // Check for breaking news
+                                const newsData = await checkBreakingNews(ticker);
+                                
+                                const runner = {
+                                    symbol: ticker,
+                                    price: currentPrice,
+                                    change_pct: currentChangePct,
+                                    change: data.price_change || 0,
+                                    volume: data.today_volume || 0,
+                                    rel_volume: data.rvol || 1,
+                                    float_millions: calculateFloat(data),
+                                    last_updated: new Date(),
+                                    category: getRunnerCategory(currentChangePct),
+                                    news_url: newsData ? getNewsUrl(newsData, ticker) : null,
+                                    has_news: newsData,
+                                    entry_id: Date.now() + Math.random(), // Unique ID for each entry
+                                    is_new_move: shouldAddNewEntry === 'new_move'
+                                };
+                                
+                                // Check if this is a new hot runner for alerts
+                                const existingRunner = currentRunners.get(ticker);
+                                const isNewHotRunner = (!existingRunner && runner.category.sound) || 
+                                                     (runner.is_new_move && runner.category.sound);
+                                
+                                // Update current runners map
+                                currentRunners.set(ticker, runner);
+                                
+                                // Add to history (this allows multiple entries)
+                                runnerHistory.unshift(runner); // Add to beginning for newest first
+                                
+                                // Keep only recent entries to prevent memory issues
+                                if (runnerHistory.length > 100) {
+                                    runnerHistory = runnerHistory.slice(0, 100);
+                                }
+                                
+                                // Update price tracking
+                                priceHistory.set(ticker, {
+                                    price: currentPrice,
+                                    change_pct: currentChangePct,
+                                    timestamp: new Date()
+                                });
+                                
+                                // Play alert for new hot runners or significant moves
+                                if (isNewHotRunner && audioEnabled) {
+                                    playAlert(runner.category.level === 'explosive' ? 1000 : 800, 300);
+                                }
+                                
+                                // Log to backend
+                                await logScannerHit({
+                                    ticker: ticker,
+                                    trigger_type: runner.is_new_move ? 'price_move_' + runner.category.level : 'running_up_' + runner.category.level,
+                                    price: runner.price,
+                                    change_pct: runner.change_pct,
+                                    volume: runner.volume,
+                                    rel_volume: runner.rel_volume,
+                                    breakout_detected: false,
+                                    news_detected: !!newsData,
+                                    momentum_score: 75
+                                });
+                                
+                                triggersFound++;
                             }
-                            
-                            // Log to backend
-                            await logScannerHit({
-                                ticker: ticker,
-                                trigger_type: 'running_up_' + runner.category.level,
-                                price: runner.price,
-                                change_pct: runner.change_pct,
-                                volume: runner.volume,
-                                rel_volume: runner.rel_volume,
-                                breakout_detected: false,
-                                news_detected: false,
-                                momentum_score: 75
-                            });
-                            
-                            triggersFound++;
                         }
                     }
                     
@@ -1517,8 +1600,9 @@
                 // Update the runner table
                 updateRunnerTable();
                 
-                if (currentRunners.size > 0) {
-                    updateLiveStatus(`✅ Tracking ${currentRunners.size} runner${currentRunners.size > 1 ? 's' : ''}`);
+                if (runnerHistory.length > 0) {
+                    const uniqueStocks = new Set(runnerHistory.map(r => r.symbol)).size;
+                    updateLiveStatus(`✅ ${runnerHistory.length} entries, ${uniqueStocks} unique runner${uniqueStocks > 1 ? 's' : ''}`);
                 } else {
                     updateLiveStatus('✅ Scan complete - no runners found');
                 }
@@ -1550,11 +1634,11 @@
             if (lastScanEl) lastScanEl.textContent = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
         }
         
-        // Update the runner table (Warrior Trading style)
+        // Update the runner table (Warrior Trading style with multiple entries)
         function updateRunnerTable() {
             const tableBody = document.getElementById('runnerTableBody');
             
-            if (currentRunners.size === 0) {
+            if (runnerHistory.length === 0) {
                 tableBody.innerHTML = `
                     <tr class="scanning-row">
                         <td colspan="10">
@@ -1568,12 +1652,12 @@
                 return;
             }
             
-            // Sort runners by % gain (highest first)
-            const sortedRunners = Array.from(currentRunners.values())
-                .sort((a, b) => b.change_pct - a.change_pct);
+            // Use history instead of current runners (shows multiple entries)
+            // Limit to most recent 20 entries to keep table manageable
+            const recentRunners = runnerHistory.slice(0, 20);
             
             let tableRows = '';
-            sortedRunners.forEach(runner => {
+            recentRunners.forEach((runner, index) => {
                 const changeSymbol = runner.change_pct >= 0 ? '+' : '';
                 const timeAgo = getTimeAgo(runner.last_updated);
                 
@@ -1582,9 +1666,16 @@
                     `<a href="${runner.news_url}" target="_blank" class="news-link">📰 News</a>` : 
                     '<span class="no-news">—</span>';
                 
+                // Add special styling for new moves
+                const rowClass = runner.is_new_move ? 'scanner-row runner-' + runner.category.level + ' new-move' : 
+                               'scanner-row runner-' + runner.category.level;
+                
+                // Add move indicator for repeated stocks
+                const moveIndicator = runner.is_new_move ? ' ⬆️' : '';
+                
                 tableRows += `
-                    <tr class="scanner-row runner-${runner.category.level}">
-                        <td class="runner-symbol">${runner.symbol}</td>
+                    <tr class="${rowClass}">
+                        <td class="runner-symbol">${runner.symbol}${moveIndicator}</td>
                         <td class="runner-price">$${runner.price.toFixed(2)}</td>
                         <td class="${changeClass}">${changeSymbol}${runner.change_pct.toFixed(1)}%</td>
                         <td class="${changeClass}">${changeSymbol}$${Math.abs(runner.change).toFixed(2)}</td>
