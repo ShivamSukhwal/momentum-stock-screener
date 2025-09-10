@@ -740,31 +740,31 @@
             </div>
             
             <div class="strategy-criteria">
-                <h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Strategy Criteria:</h3>
+                <h3 style="color: #2c3e50; margin-bottom: 15px;">🚨 BREAKOUT + NEWS SCANNER:</h3>
                 <div class="criteria-grid">
                     <div class="criteria-item">
-                        <span class="criteria-label">🚀 High % Gainers:</span>
-                        <span class="criteria-value">10%+ intraday moves</span>
+                        <span class="criteria-label">⚡ Rapid Squeeze:</span>
+                        <span class="criteria-value">5%+ move in under 1 minute</span>
                     </div>
                     <div class="criteria-item">
                         <span class="criteria-label">💰 Price Range:</span>
-                        <span class="criteria-value">$2 - $20 (affordable entry)</span>
+                        <span class="criteria-value">$2 - $20 only</span>
                     </div>
                     <div class="criteria-item">
-                        <span class="criteria-label">🎈 Low Float:</span>
-                        <span class="criteria-value">&lt;20M shares outstanding</span>
+                        <span class="criteria-label">📰 Breaking News:</span>
+                        <span class="criteria-value">Recent news mentions (2 hours)</span>
                     </div>
                     <div class="criteria-item">
-                        <span class="criteria-label">📊 High Volume:</span>
-                        <span class="criteria-value">5x+ average volume</span>
+                        <span class="criteria-label">📊 Volume Spike:</span>
+                        <span class="criteria-value">10x+ volume explosion</span>
                     </div>
                     <div class="criteria-item">
-                        <span class="criteria-label">⚡ Catalysts:</span>
-                        <span class="criteria-value">Earnings, FDA, news events</span>
+                        <span class="criteria-label">⏱️ Scan Speed:</span>
+                        <span class="criteria-value">Every 30 seconds (Polygon Pro)</span>
                     </div>
                     <div class="criteria-item">
-                        <span class="criteria-label">🎯 Momentum Score:</span>
-                        <span class="criteria-value">70+ (high momentum)</span>
+                        <span class="criteria-label">🎯 Detection:</span>
+                        <span class="criteria-value">Minute-level price analysis</span>
                     </div>
                 </div>
             </div>
@@ -782,12 +782,32 @@
                     <span class="stat-value" id="last-scan">--:--</span>
                     <span class="stat-label">Last Scan</span>
                 </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="daily-hits">--</span>
+                    <span class="stat-label">Today's Total</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="unique-tickers">--</span>
+                    <span class="stat-label">Unique Stocks</span>
+                </div>
+                <div class="stat-item" style="cursor: pointer;" onclick="showDailySummary()">
+                    <span class="stat-value">📊</span>
+                    <span class="stat-label">View Daily Log</span>
+                </div>
+                <div class="stat-item" style="cursor: pointer;" onclick="exportForAnalysis()">
+                    <span class="stat-value">🤖</span>
+                    <span class="stat-label">Export for AI</span>
+                </div>
+                <div class="stat-item" style="cursor: pointer;" onclick="showStorageStats()">
+                    <span class="stat-value">💾</span>
+                    <span class="stat-label">Storage Stats</span>
+                </div>
             </div>
             
             <div id="strategy-content">
                 <div class="empty-state">
                     <h3>🚨 Live Feed Active</h3>
-                    <p>Scanning for momentum triggers every 2 minutes. Stocks will appear here as they hit your criteria.</p>
+                    <p>Scanning for breakout + news triggers every 30 seconds. Looking for 5%+ squeezes or breaking news mentions in $2-$20 range.</p>
                     <div class="scanning-animation">
                         <div class="pulse-dot"></div>
                         <span>Monitoring market...</span>
@@ -1157,15 +1177,21 @@
             liveFeedActive = true;
             updateLiveStatus('🚨 Live feed active');
             
+            // Load daily stats
+            loadDailyStats();
+            
             // Initial scan
             scanForTriggers();
             
-            // Set up automatic scanning every 2 minutes
+            // Set up automatic scanning every 30 seconds (highest tier Polygon)
             liveFeedInterval = setInterval(() => {
                 if (liveFeedActive) {
                     scanForTriggers();
                 }
-            }, 120000); // 2 minutes
+            }, 30000); // 30 seconds for rapid breakout detection
+            
+            // Update daily stats every 5 minutes
+            setInterval(loadDailyStats, 300000); // 5 minutes
         }
         
         // Stop the live feed
@@ -1191,8 +1217,8 @@
                 // Randomize order to scan different stocks each time
                 const shuffledTickers = [...STRATEGY_TICKERS].sort(() => Math.random() - 0.5);
                 
-                // Scan a subset each time (15 stocks every 2 minutes)
-                const subsetsToScan = shuffledTickers.slice(0, 15);
+                // Scan more stocks per cycle with faster refresh (25 stocks every 30 seconds)
+                const subsetsToScan = shuffledTickers.slice(0, 25);
                 
                 for (const ticker of subsetsToScan) {
                     if (!liveFeedActive) break; // Stop if feed was disabled
@@ -1205,7 +1231,11 @@
                     
                     if (data && data.last_price && data.price_change_pct !== undefined) {
                         // Check if it meets strategy and we haven't triggered on it recently
-                        if (meetsStrategyRequirements(data, ticker) && !triggeredStocks.has(ticker)) {
+                        if (await meetsStrategyRequirements(data, ticker) && !triggeredStocks.has(ticker)) {
+                            // Check what type of trigger this is
+                            const hasBreakout = await checkMinuteBreakout(ticker);
+                            const hasNews = await checkBreakingNews(ticker);
+                            
                             const trigger = {
                                 symbol: ticker,
                                 price: data.last_price,
@@ -1216,8 +1246,13 @@
                                 momentum: data.momentum_score || 50,
                                 float_millions: calculateFloat(data),
                                 has_catalyst: detectCatalyst(data),
-                                triggered_at: new Date()
+                                triggered_at: new Date(),
+                                breakout_detected: hasBreakout,
+                                news_detected: hasNews
                             };
+                            
+                            // Log the hit to backend
+                            await logScannerHit(trigger);
                             
                             newTriggers.push(trigger);
                             triggeredStocks.add(ticker);
@@ -1312,6 +1347,19 @@
         function createTriggerCard(trigger, isNew = false) {
             const changeClass = trigger.change_pct >= 0 ? 'positive' : 'negative';
             const changeSymbol = trigger.change_pct >= 0 ? '+' : '';
+            
+            // Determine trigger type badges
+            let triggerBadges = '';
+            if (trigger.breakout_detected && trigger.news_detected) {
+                triggerBadges = '<span class="strategy-badge" style="background: #ff6b6b;">⚡ BREAKOUT + NEWS</span>';
+            } else if (trigger.breakout_detected) {
+                triggerBadges = '<span class="strategy-badge" style="background: #f39c12;">⚡ 5% MINUTE SQUEEZE</span>';
+            } else if (trigger.news_detected) {
+                triggerBadges = '<span class="strategy-badge" style="background: #3498db;">📰 BREAKING NEWS</span>';
+            } else {
+                triggerBadges = '<span class="strategy-badge" style="background: #9b59b6;">📊 VOLUME SPIKE</span>';
+            }
+            
             const catalystBadge = trigger.has_catalyst ? '<span class="strategy-badge">🚨 CATALYST</span>' : '';
             const newBadge = isNew ? '<span class="trigger-alert">🔥 NEW TRIGGER</span>' : '';
             const timeAgo = isNew ? 'Just now' : formatTimeAgo(trigger.triggered_at);
@@ -1344,6 +1392,7 @@
                             <div class="metric-value">${trigger.momentum.toFixed(0)}</div>
                         </div>
                     </div>
+                    ${triggerBadges}
                     ${catalystBadge}
                     ${newBadge}
                 </div>
@@ -1365,25 +1414,27 @@
             return date.toLocaleDateString();
         }
         
-        // Check if stock meets your exact strategy requirements
-        function meetsStrategyRequirements(data, ticker) {
+        // Check if stock meets new breakout + news scanner requirements
+        async function meetsStrategyRequirements(data, ticker) {
             const price = data.last_price;
             const changePct = data.price_change_pct;
             const relVolume = data.rvol || 1;
-            const momentum = data.momentum_score || 50;
-            const floatMil = calculateFloat(data);
             
-            // Your exact criteria:
-            const criteria = {
-                highGainer: changePct >= 10.0,                    // 10%+ intraday moves
-                priceRange: price >= 2.0 && price <= 20.0,       // $2-$20 affordable entry
-                lowFloat: floatMil <= 20.0,                       // <20M shares outstanding  
-                highVolume: relVolume >= 5.0,                     // 5x+ average volume
-                strongMomentum: momentum >= 70                    // High momentum score
-            };
+            // Must be in $2-$20 range
+            if (price < 2.0 || price > 20.0) {
+                return false;
+            }
             
-            // Must meet ALL criteria for your strategy
-            return Object.values(criteria).every(met => met === true);
+            // Check for 5%+ minute squeeze using new breakout endpoint
+            const hasMinuteBreakout = await checkMinuteBreakout(ticker);
+            
+            // Check for breaking news mentions
+            const hasBreakingNews = await checkBreakingNews(ticker);
+            
+            // Must have EITHER breakout OR news (plus massive volume spike)
+            const volumeSpike = relVolume >= 10.0; // 10x volume explosion
+            
+            return (hasMinuteBreakout || hasBreakingNews) && volumeSpike;
         }
         
         // Calculate realistic float estimation
@@ -1399,7 +1450,96 @@
             return Math.random() * 40 + 20;                                         // 20-60M (filtered out)
         }
         
-        // Detect potential catalysts
+        // Check for 5%+ minute-level breakout using new API endpoint
+        async function checkMinuteBreakout(ticker) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/breakout?ticker=${ticker}`, {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' },
+                    mode: 'cors'
+                });
+                
+                if (!response.ok) return false;
+                const data = await response.json();
+                
+                // Check if any minute in last few minutes had 5%+ move
+                return data.has_breakout && data.max_minute_change >= 5.0;
+                
+            } catch (error) {
+                console.warn(`Breakout check failed for ${ticker}:`, error);
+                return false;
+            }
+        }
+        
+        // Check for breaking news mentions using new API endpoint
+        async function checkBreakingNews(ticker) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/recent-news?ticker=${ticker}`, {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' },
+                    mode: 'cors'
+                });
+                
+                if (!response.ok) return false;
+                const data = await response.json();
+                
+                // Check if ticker was mentioned in recent news (last 2 hours)
+                return data.has_recent_news && data.news_count > 0;
+                
+            } catch (error) {
+                console.warn(`News check failed for ${ticker}:`, error);
+                return false;
+            }
+        }
+        
+        // Log scanner hit to backend
+        async function logScannerHit(trigger) {
+            try {
+                const logData = {
+                    ticker: trigger.symbol,
+                    trigger_type: getTriggerType(trigger),
+                    price: trigger.price,
+                    change_pct: trigger.change_pct,
+                    volume: trigger.volume,
+                    rel_volume: trigger.rel_volume,
+                    breakout_detected: trigger.breakout_detected || false,
+                    news_detected: trigger.news_detected || false,
+                    momentum_score: trigger.momentum
+                };
+                
+                const response = await fetch(`${API_BASE_URL}/log-hit`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    mode: 'cors',
+                    body: JSON.stringify(logData)
+                });
+                
+                if (!response.ok) {
+                    console.warn('Failed to log scanner hit:', response.status);
+                }
+                
+            } catch (error) {
+                console.warn('Error logging scanner hit:', error);
+            }
+        }
+        
+        // Determine trigger type for logging
+        function getTriggerType(trigger) {
+            if (trigger.breakout_detected && trigger.news_detected) {
+                return 'breakout_and_news';
+            } else if (trigger.breakout_detected) {
+                return 'minute_breakout';
+            } else if (trigger.news_detected) {
+                return 'breaking_news';
+            } else {
+                return 'volume_spike';
+            }
+        }
+        
+        // Detect potential catalysts (updated for new system)
         function detectCatalyst(data) {
             const momentum = data.momentum_score || 50;
             const relVolume = data.rvol || 1;
@@ -1664,6 +1804,168 @@
                 });
             }
         });
+        
+        // Load daily scanner stats
+        async function loadDailyStats() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/daily-summary`, {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' },
+                    mode: 'cors'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    const dailyHitsEl = document.getElementById('daily-hits');
+                    const uniqueTickersEl = document.getElementById('unique-tickers');
+                    
+                    if (dailyHitsEl) dailyHitsEl.textContent = data.total_hits || 0;
+                    if (uniqueTickersEl) uniqueTickersEl.textContent = data.unique_tickers || 0;
+                }
+            } catch (error) {
+                console.warn('Failed to load daily stats:', error);
+            }
+        }
+        
+        // Show daily summary modal/popup
+        async function showDailySummary() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/daily-summary`, {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' },
+                    mode: 'cors'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Create a comprehensive summary
+                    let summaryText = `📅 Daily Scanner Summary - ${data.date}\n\n`;
+                    summaryText += `📊 Total Hits: ${data.total_hits || 0}\n`;
+                    summaryText += `🎯 Unique Stocks: ${data.unique_tickers || 0}\n`;
+                    
+                    if (data.trigger_types) {
+                        summaryText += `\n🔄 Trigger Breakdown:\n`;
+                        Object.entries(data.trigger_types).forEach(([type, count]) => {
+                            if (count > 0) {
+                                summaryText += `  • ${type.replace('_', ' ')}: ${count}\n`;
+                            }
+                        });
+                    }
+                    
+                    if (data.scanner_hits && data.scanner_hits.length > 0) {
+                        summaryText += `\n🕍 Recent Triggers:\n`;
+                        data.scanner_hits.slice(-5).forEach(hit => {
+                            const time = new Date(hit.timestamp).toLocaleTimeString();
+                            const trigger = hit.trigger_analysis?.primary_trigger || 'unknown';
+                            summaryText += `  • ${hit.stock_data?.ticker} (${trigger}) at ${time}\n`;
+                        });
+                    }
+                    
+                    summaryText += `\n🤖 Logs are ChatGPT-optimized with structured data, metadata, and analysis context.`;
+                    
+                    alert(summaryText);
+                } else {
+                    alert('Failed to load daily summary');
+                }
+            } catch (error) {
+                alert('Error loading daily summary: ' + error.message);
+            }
+        }
+        
+        // Export data for ChatGPT analysis
+        async function exportForAnalysis() {
+            try {
+                const days = prompt('How many days to analyze? (1-7)', '1');
+                if (!days || isNaN(days)) return;
+                
+                const response = await fetch(`${API_BASE_URL}/export-analysis?days=${days}`, {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' },
+                    mode: 'cors'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Create downloadable JSON file
+                    const blob = new Blob([JSON.stringify(data, null, 2)], {
+                        type: 'application/json'
+                    });
+                    
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `scanner_analysis_${days}days_${new Date().toISOString().split('T')[0]}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    
+                    alert(`Downloaded ${days}-day analysis data for ChatGPT!\n\nFile contains:\n• Structured hit data\n• Performance statistics\n• Pattern analysis\n• ChatGPT instructions`);
+                } else {
+                    alert('Failed to export analysis data');
+                }
+            } catch (error) {
+                alert('Error exporting data: ' + error.message);
+            }
+        }
+        
+        // Show permanent storage statistics
+        async function showStorageStats() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/database-stats`, {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' },
+                    mode: 'cors'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const storage = data.permanent_storage;
+                    
+                    let statsText = `💾 PERMANENT STORAGE STATUS\n\n`;
+                    statsText += `📊 Total Hits Stored: ${storage.total_hits_stored.toLocaleString()}\n`;
+                    statsText += `🎯 Unique Tickers: ${storage.unique_tickers}\n`;
+                    statsText += `📅 Date Range: ${storage.date_range.first_hit || 'N/A'} to ${storage.date_range.latest_hit || 'N/A'}\n`;
+                    statsText += `💾 Database Size: ${storage.database_size_mb} MB\n`;
+                    statsText += `📁 Backup Files: ${storage.backup_files}\n\n`;
+                    statsText += `✅ ${data.storage_status}\n`;
+                    statsText += `♾️ ${data.retention_policy}\n\n`;
+                    statsText += `🛡️ Your data is safe:\n`;
+                    statsText += `  • Dual storage: JSON + SQLite database\n`;
+                    statsText += `  • Automatic backups created daily\n`;
+                    statsText += `  • No 30-day deletion limit\n`;
+                    statsText += `  • ChatGPT-optimized format preserved`;
+                    
+                    alert(statsText);
+                } else {
+                    alert('Failed to load storage statistics');
+                }
+            } catch (error) {
+                alert('Error loading storage stats: ' + error.message);
+            }
+        }
+        
+        // Archive logs at midnight (you can call this manually or set up a cron job)
+        async function archiveDailyLogs() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/archive-logs`, {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json' },
+                    mode: 'cors'
+                });
+                
+                if (response.ok) {
+                    console.log('Daily logs archived successfully');
+                } else {
+                    console.warn('Failed to archive logs');
+                }
+            } catch (error) {
+                console.warn('Error archiving logs:', error);
+            }
+        }
         
         // Auto-load gainers when page loads
         window.addEventListener('load', function() {
