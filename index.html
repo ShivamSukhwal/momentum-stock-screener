@@ -1702,7 +1702,9 @@
             let tableRows = '';
             recentRunners.forEach((runner, index) => {
                 const changeSymbol = runner.change_pct >= 0 ? '+' : '';
-                const timeAgo = getTimeAgo(runner.last_updated);
+                const timestamp = runner.last_updated ? 
+                    new Date(runner.last_updated).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 
+                    new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                 
                 const changeClass = runner.change_pct >= 0 ? 'change-positive' : 'change-negative';
                 const newsCell = runner.news_url ? 

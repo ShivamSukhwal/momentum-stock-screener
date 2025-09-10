@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Scanner AI Data - Live Feed</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #000;
+            color: #00ff00;
+            padding: 20px;
+            margin: 0;
+        }
+        .data-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #00ff00;
+            background: #001100;
+        }
+        .data-title {
+            color: #ffff00;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .stock-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 3px solid #00ff00;
+            padding-left: 10px;
+        }
+        .timestamp {
+            color: #888;
+            font-size: 0.9em;
+        }
+        .category-explosive { border-left-color: #ff0066; }
+        .category-hot { border-left-color: #ff4444; }
+        .category-strong { border-left-color: #ff8800; }
+        .category-runner { border-left-color: #00cc44; }
+    </style>
+</head>
+<body>
+    <h1>🚀 LIVE STOCK SCANNER DATA FEED</h1>
+    <p class="timestamp">Last Updated: <span id="lastUpdate">Loading...</span></p>
+    
+    <div class="data-section">
+        <div class="data-title">CURRENT MOMENTUM STOCKS</div>
+        <div id="currentStocks">Loading scanner data...</div>
+    </div>
+    
+    <div class="data-section">
+        <div class="data-title">BREAKING NEWS ALERTS</div>
+        <div id="newsData">Loading news data...</div>
+    </div>
+    
+    <div class="data-section">
+        <div class="data-title">SCANNER STATISTICS</div>
+        <div id="scannerStats">Loading statistics...</div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'https://shivamyourmom.com/api';
+        
+        // Update every 30 seconds
+        setInterval(updateData, 30000);
+        updateData(); // Initial load
+        
+        async function updateData() {
+            document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
+            
+            try {
+                await Promise.all([
+                    loadCurrentStocks(),
+                    loadNewsData(),
+                    loadScannerStats()
+                ]);
+            } catch (error) {
+                console.error('Error loading data:', error);
+            }
+        }
+        
+        async function loadCurrentStocks() {
+            const container = document.getElementById('currentStocks');
+            
+            // Get stored scanner data from localStorage
+            const savedData = localStorage.getItem('warriorScannerData');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                const runners = data.runnerHistory || [];
+                
+                if (runners.length === 0) {
+                    container.innerHTML = 'No active momentum stocks found.';
+                    return;
+                }
+                
+                let output = '';
+                runners.slice(0, 10).forEach(runner => {
+                    const timestamp = new Date(runner.last_updated).toLocaleTimeString();
+                    const changeSymbol = runner.change_pct >= 0 ? '+' : '';
+                    
+                    output += `
+                        <div class="stock-entry category-${runner.category.level}">
+                            SYMBOL: ${runner.symbol} | 
+                            PRICE: $${runner.price.toFixed(2)} | 
+                            CHANGE: ${changeSymbol}${runner.change_pct.toFixed(2)}% | 
+                            VOLUME: ${formatVolume(runner.volume)} | 
+                            CATEGORY: ${runner.category.level.toUpperCase()} | 
+                            TIME: ${timestamp}
+                            ${runner.news_url ? ' | NEWS: YES' : ''}
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = output;
+            } else {
+                container.innerHTML = 'No scanner data available. Scanner may not be running.';
+            }
+        }
+        
+        async function loadNewsData() {
+            const container = document.getElementById('newsData');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/recent-news`, {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' },
+                    mode: 'cors'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const newsArray = data.recent_news || [];
+                    
+                    if (newsArray.length === 0) {
+                        container.innerHTML = 'No recent breaking news found.';
+                        return;
+                    }
+                    
+                    let output = '';
+                    newsArray.slice(0, 5).forEach(item => {
+                        const newsTime = new Date(item.datetime).toLocaleString();
+                        output += `
+                            <div class="stock-entry">
+                                HEADLINE: ${item.headline} | 
+                                SOURCE: ${item.source} | 
+                                TIME: ${newsTime}
+                                SUMMARY: ${item.summary.substring(0, 100)}...
+                            </div>
+                        `;
+                    });
+                    
+                    container.innerHTML = output;
+                } else {
+                    container.innerHTML = 'Unable to load news data.';
+                }
+            } catch (error) {
+                container.innerHTML = 'News service unavailable.';
+            }
+        }
+        
+        async function loadScannerStats() {
+            const container = document.getElementById('scannerStats');
+            
+            const savedData = localStorage.getItem('warriorScannerData');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                
+                const stats = `
+                    <div class="stock-entry">
+                        TOTAL_SCANNED: ${data.totalScanned || 0} | 
+                        TRIGGERS_FOUND: ${data.triggersFound || 0} | 
+                        ACTIVE_RUNNERS: ${data.runnerHistory ? data.runnerHistory.length : 0} | 
+                        LAST_SAVED: ${data.lastSaved ? new Date(data.lastSaved).toLocaleString() : 'Never'}
+                    </div>
+                `;
+                
+                container.innerHTML = stats;
+            } else {
+                container.innerHTML = 'No scanner statistics available.';
+            }
+        }
+        
+        function formatVolume(volume) {
+            if (!volume) return 'N/A';
+            if (volume >= 1000000) {
+                return (volume / 1000000).toFixed(1) + 'M';
+            } else if (volume >= 1000) {
+                return (volume / 1000).toFixed(0) + 'K';
+            }
+            return volume.toString();
+        }
+    </script>
+</body>
+</html>
