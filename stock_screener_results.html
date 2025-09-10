@@ -1,0 +1,152 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Screener Results</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+        .criteria {
+            background: #ecf0f1;
+            padding: 20px 30px;
+            border-bottom: 1px solid #bdc3c7;
+        }
+        .criteria h3 {
+            margin: 0 0 10px 0;
+            color: #2c3e50;
+        }
+        .criteria-item {
+            display: inline-block;
+            margin: 5px 15px 5px 0;
+            padding: 8px 16px;
+            background: #3498db;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+        .summary {
+            padding: 20px 30px;
+            text-align: center;
+            font-size: 1.2em;
+            color: #2c3e50;
+        }
+        .table-container {
+            padding: 0 30px 30px 30px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        th {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 500;
+            border-bottom: 3px solid #2980b9;
+        }
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        tr:hover {
+            background: #e8f4f8;
+            transform: scale(1.01);
+            transition: all 0.2s ease;
+        }
+        .positive {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .negative {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .symbol {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #2c3e50;
+        }
+        .price {
+            font-weight: bold;
+            color: #8e44ad;
+        }
+        .volume {
+            color: #7f8c8d;
+        }
+        .timestamp {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+            font-size: 0.9em;
+            border-top: 1px solid #ecf0f1;
+        }
+        .no-results {
+            text-align: center;
+            padding: 50px;
+            color: #7f8c8d;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Momentum Stock Screener</h1>
+            <p>High % Gainers • Low Float • High Volume • Strong Catalysts</p>
+        </div>
+        
+        <div class="criteria">
+            <h3>Your Trading Strategy:</h3>
+            <span class="criteria-item">High Gainers: 10.0%+ intraday</span>
+            <span class="criteria-item">Price Range: $2.0 - $20.0</span>
+            <span class="criteria-item">Low Float: <20.0M shares</span>
+            <span class="criteria-item">High Volume: 5.0x+ average</span>
+        </div>
+        
+        <div class="summary">
+            <strong>0</strong> stocks found matching criteria
+        </div>
+        
+        <div class="table-container">
+            <div class="no-results">No stocks found matching the specified criteria.</div>
+        </div>
+        
+        <div class="timestamp">
+            Generated on 2025-09-08 18:31:49
+        </div>
+    </div>
+</body>
+</html>
+        
