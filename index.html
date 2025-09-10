@@ -553,6 +553,127 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
+        
+        .live-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.9);
+            padding: 10px 15px;
+            border-radius: 25px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            background: #28a745;
+            border-radius: 50%;
+            animation: pulse-live 2s infinite;
+        }
+        
+        @keyframes pulse-live {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.2); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        
+        .live-feed-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        
+        .stat-value {
+            display: block;
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .scanning-animation {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 8px;
+            color: #3498db;
+        }
+        
+        .pulse-dot {
+            width: 10px;
+            height: 10px;
+            background: #3498db;
+            border-radius: 50%;
+            animation: pulse-scan 1.5s infinite;
+        }
+        
+        @keyframes pulse-scan {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(1.5); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        
+        .new-trigger {
+            animation: slideInTrigger 0.8s ease-out;
+            border: 3px solid #ff6b6b !important;
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.3) !important;
+        }
+        
+        @keyframes slideInTrigger {
+            0% { 
+                opacity: 0; 
+                transform: translateY(-20px) scale(0.95);
+            }
+            100% { 
+                opacity: 1; 
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .trigger-alert {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            animation: pulse-alert 2s infinite;
+        }
+        
+        @keyframes pulse-alert {
+            0% { opacity: 1; }
+            50% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -611,8 +732,11 @@
         <!-- My Strategy Tab -->
         <div id="strategy" class="tab-content">
             <div class="section-header">
-                <h2 class="section-title">🎯 My Momentum Strategy</h2>
-                <button class="refresh-btn" onclick="loadStrategyStocks()">🔍 Find Plays</button>
+                <h2 class="section-title">🚨 Live Momentum Triggers</h2>
+                <div class="live-status">
+                    <div class="status-indicator"></div>
+                    <span id="live-status-text">Starting live feed...</span>
+                </div>
             </div>
             
             <div class="strategy-criteria">
@@ -645,10 +769,29 @@
                 </div>
             </div>
             
+            <div class="live-feed-stats">
+                <div class="stat-item">
+                    <span class="stat-value" id="total-scanned">0</span>
+                    <span class="stat-label">Stocks Scanned</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="triggers-found">0</span>
+                    <span class="stat-label">Triggers Found</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="last-scan">--:--</span>
+                    <span class="stat-label">Last Scan</span>
+                </div>
+            </div>
+            
             <div id="strategy-content">
                 <div class="empty-state">
-                    <h3>🎯 Ready to find momentum plays?</h3>
-                    <p>Click "🔍 Find Plays" to scan for stocks matching your exact strategy</p>
+                    <h3>🚨 Live Feed Active</h3>
+                    <p>Scanning for momentum triggers every 2 minutes. Stocks will appear here as they hit your criteria.</p>
+                    <div class="scanning-animation">
+                        <div class="pulse-dot"></div>
+                        <span>Monitoring market...</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -726,7 +869,7 @@
             } else if (tabName === 'volume') {
                 loadHighVolume();
             } else if (tabName === 'strategy') {
-                // Don't auto-load, let user trigger the search
+                startLiveMomentumFeed()
             } else if (tabName === 'tracker') {
                 // Don't auto-load, let user enter ticker
             } else if (tabName === 'news') {
@@ -999,33 +1142,71 @@
             'MULN', 'BBIG', 'ATER', 'RDBX', 'NILE', 'GFAI', 'IMPP', 'INDO', 'EVFM', 'GROM'
         ];
         
-        // Load stocks matching your exact momentum strategy
-        async function loadStrategyStocks() {
-            const container = document.getElementById('strategy-content');
-            container.innerHTML = `
-                <div class="loading">
-                    <div class="spinner"></div>
-                    <p>🎯 Scanning ${STRATEGY_TICKERS.length} tickers for perfect momentum plays...</p>
-                    <small>Looking for 10%+ gainers, $2-$20 range, low float, high volume, strong momentum</small>
-                </div>
-            `;
+        // Live momentum feed variables
+        let liveFeedInterval = null;
+        let liveFeedActive = false;
+        let totalScanned = 0;
+        let triggersFound = 0;
+        let triggeredStocks = new Set(); // Track stocks we've already triggered on
+        let currentTriggers = []; // Current live triggers
+        
+        // Start the live momentum trigger feed
+        function startLiveMomentumFeed() {
+            if (liveFeedActive) return; // Already running
+            
+            liveFeedActive = true;
+            updateLiveStatus('🚨 Live feed active');
+            
+            // Initial scan
+            scanForTriggers();
+            
+            // Set up automatic scanning every 2 minutes
+            liveFeedInterval = setInterval(() => {
+                if (liveFeedActive) {
+                    scanForTriggers();
+                }
+            }, 120000); // 2 minutes
+        }
+        
+        // Stop the live feed
+        function stopLiveMomentumFeed() {
+            liveFeedActive = false;
+            if (liveFeedInterval) {
+                clearInterval(liveFeedInterval);
+                liveFeedInterval = null;
+            }
+            updateLiveStatus('Feed stopped');
+        }
+        
+        // Scan for momentum triggers
+        async function scanForTriggers() {
+            if (!liveFeedActive) return;
+            
+            updateLiveStatus('🔍 Scanning for triggers...');
             
             try {
-                const perfectPlays = [];
-                let scannedCount = 0;
+                let scannedInThisRound = 0;
+                const newTriggers = [];
                 
-                for (const ticker of STRATEGY_TICKERS) {
-                    const data = await getStockData(ticker);
-                    scannedCount++;
+                // Randomize order to scan different stocks each time
+                const shuffledTickers = [...STRATEGY_TICKERS].sort(() => Math.random() - 0.5);
+                
+                // Scan a subset each time (15 stocks every 2 minutes)
+                const subsetsToScan = shuffledTickers.slice(0, 15);
+                
+                for (const ticker of subsetsToScan) {
+                    if (!liveFeedActive) break; // Stop if feed was disabled
                     
-                    // Update progress
-                    container.querySelector('p').textContent = 
-                        `🔍 Scanning ${ticker}... (${scannedCount}/${STRATEGY_TICKERS.length})`;
+                    const data = await getStockData(ticker);
+                    scannedInThisRound++;
+                    totalScanned++;
+                    
+                    updateScanStats(totalScanned, triggersFound);
                     
                     if (data && data.last_price && data.price_change_pct !== undefined) {
-                        // Apply your exact strategy criteria
-                        if (meetsStrategyRequirements(data, ticker)) {
-                            perfectPlays.push({
+                        // Check if it meets strategy and we haven't triggered on it recently
+                        if (meetsStrategyRequirements(data, ticker) && !triggeredStocks.has(ticker)) {
+                            const trigger = {
                                 symbol: ticker,
                                 price: data.last_price,
                                 change_pct: data.price_change_pct,
@@ -1033,34 +1214,155 @@
                                 volume: data.today_volume || 0,
                                 rel_volume: data.rvol || 1,
                                 momentum: data.momentum_score || 50,
-                                float_millions: calculateFloat(data), // Simulated but realistic
-                                has_catalyst: detectCatalyst(data)
-                            });
+                                float_millions: calculateFloat(data),
+                                has_catalyst: detectCatalyst(data),
+                                triggered_at: new Date()
+                            };
+                            
+                            newTriggers.push(trigger);
+                            triggeredStocks.add(ticker);
+                            triggersFound++;
+                            
+                            // Remove from triggered set after 1 hour to allow re-triggering
+                            setTimeout(() => {
+                                triggeredStocks.delete(ticker);
+                            }, 3600000); // 1 hour
                         }
                     }
                     
-                    // Small delay to avoid overwhelming the API
-                    await new Promise(resolve => setTimeout(resolve, 150));
+                    // Small delay between requests
+                    await new Promise(resolve => setTimeout(resolve, 200));
                 }
                 
-                // Sort by momentum score then by % gain
-                perfectPlays.sort((a, b) => {
-                    if (b.momentum !== a.momentum) {
-                        return b.momentum - a.momentum;
-                    }
-                    return b.change_pct - a.change_pct;
-                });
+                // Add new triggers to the display
+                if (newTriggers.length > 0) {
+                    addNewTriggers(newTriggers);
+                    updateLiveStatus(`✅ Found ${newTriggers.length} new trigger${newTriggers.length > 1 ? 's' : ''}!`);
+                } else {
+                    updateLiveStatus('✅ Scan complete - monitoring...');
+                }
                 
-                displayStrategyResults(perfectPlays);
+                updateScanStats(totalScanned, triggersFound);
                 
             } catch (error) {
-                container.innerHTML = `
-                    <div class="error">
-                        <strong>❌ Strategy scan failed</strong><br>
-                        ${error.message}
-                    </div>
-                `;
+                updateLiveStatus('❌ Scan error - retrying soon...');
+                console.error('Live feed scan error:', error);
             }
+        }
+        
+        // Update live status
+        function updateLiveStatus(message) {
+            const statusText = document.getElementById('live-status-text');
+            if (statusText) {
+                statusText.textContent = message;
+            }
+        }
+        
+        // Update scan statistics
+        function updateScanStats(scanned, found) {
+            const totalScannedEl = document.getElementById('total-scanned');
+            const triggersFoundEl = document.getElementById('triggers-found');
+            const lastScanEl = document.getElementById('last-scan');
+            
+            if (totalScannedEl) totalScannedEl.textContent = scanned;
+            if (triggersFoundEl) triggersFoundEl.textContent = found;
+            if (lastScanEl) lastScanEl.textContent = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+        
+        // Add new triggers to the display
+        function addNewTriggers(newTriggers) {
+            const container = document.getElementById('strategy-content');
+            
+            // Remove empty state if it exists
+            const emptyState = container.querySelector('.empty-state');
+            if (emptyState) {
+                container.innerHTML = '<div class="stocks-grid"></div>';
+            }
+            
+            const grid = container.querySelector('.stocks-grid');
+            if (!grid) {
+                container.innerHTML = '<div class="stocks-grid"></div>';
+            }
+            
+            // Add each new trigger with animation
+            newTriggers.forEach(trigger => {
+                const triggerCard = createTriggerCard(trigger, true); // true = new trigger
+                container.querySelector('.stocks-grid').insertAdjacentHTML('afterbegin', triggerCard);
+                
+                // Add animation class
+                const newCard = container.querySelector('.stocks-grid').firstElementChild;
+                newCard.classList.add('new-trigger');
+                
+                // Remove animation class after animation completes
+                setTimeout(() => {
+                    newCard.classList.remove('new-trigger');
+                }, 800);
+            });
+            
+            // Keep only the most recent 20 triggers
+            const allCards = container.querySelectorAll('.strategy-stock-card');
+            if (allCards.length > 20) {
+                for (let i = 20; i < allCards.length; i++) {
+                    allCards[i].remove();
+                }
+            }
+        }
+        
+        // Create trigger card HTML
+        function createTriggerCard(trigger, isNew = false) {
+            const changeClass = trigger.change_pct >= 0 ? 'positive' : 'negative';
+            const changeSymbol = trigger.change_pct >= 0 ? '+' : '';
+            const catalystBadge = trigger.has_catalyst ? '<span class="strategy-badge">🚨 CATALYST</span>' : '';
+            const newBadge = isNew ? '<span class="trigger-alert">🔥 NEW TRIGGER</span>' : '';
+            const timeAgo = isNew ? 'Just now' : formatTimeAgo(trigger.triggered_at);
+            
+            return `
+                <div class="strategy-stock-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <div class="stock-symbol">${trigger.symbol}</div>
+                        <small style="color: #6c757d;">${timeAgo}</small>
+                    </div>
+                    <div class="stock-price">$${trigger.price.toFixed(2)}</div>
+                    <div class="stock-change ${changeClass}">
+                        ${changeSymbol}${trigger.change_pct.toFixed(2)}% (${changeSymbol}$${Math.abs(trigger.change).toFixed(2)})
+                    </div>
+                    <div class="stock-metrics">
+                        <div class="metric">
+                            <div class="metric-label">Volume</div>
+                            <div class="metric-value">${(trigger.volume / 1000000).toFixed(1)}M</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Rel Vol</div>
+                            <div class="metric-value">${trigger.rel_volume.toFixed(1)}x</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Float</div>
+                            <div class="metric-value">${trigger.float_millions.toFixed(1)}M</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Momentum</div>
+                            <div class="metric-value">${trigger.momentum.toFixed(0)}</div>
+                        </div>
+                    </div>
+                    ${catalystBadge}
+                    ${newBadge}
+                </div>
+            `;
+        }
+        
+        // Format time ago
+        function formatTimeAgo(date) {
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            
+            const diffHours = Math.floor(diffMins / 60);
+            if (diffHours < 24) return `${diffHours}h ago`;
+            
+            return date.toLocaleDateString();
         }
         
         // Check if stock meets your exact strategy requirements
