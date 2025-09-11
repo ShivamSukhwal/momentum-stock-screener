@@ -497,9 +497,12 @@
         loadDailyStats();
         
         // Audio toggle
-        document.getElementById('audioToggle').addEventListener('change', function(e) {
-            audioEnabled = e.target.checked;
-        });
+        const audioToggle = document.getElementById('audioToggle');
+        if (audioToggle) {
+            audioToggle.addEventListener('change', function(e) {
+                audioEnabled = e.target.checked;
+            });
+        }
         
         // Check if market is open for scanning (4am-8pm ET)
         function isMarketOpenForScanning() {
@@ -550,9 +553,13 @@
             liveFeedActive = true;
             
             // Update UI
-            document.getElementById('startBtn').disabled = true;
-            document.getElementById('stopBtn').disabled = false;
-            document.getElementById('statusDot').classList.add('active');
+            const startBtn = document.getElementById('startBtn');
+            const stopBtn = document.getElementById('stopBtn');
+            const statusDot = document.getElementById('statusDot');
+            
+            if (startBtn) startBtn.disabled = true;
+            if (stopBtn) stopBtn.disabled = false;
+            if (statusDot) statusDot.classList.add('active');
             
             // Clear any existing data
             runnerHistory = [];
@@ -580,9 +587,13 @@
             }
             
             // Update UI
-            document.getElementById('startBtn').disabled = false;
-            document.getElementById('stopBtn').disabled = true;
-            document.getElementById('statusDot').classList.remove('active');
+            const startBtn = document.getElementById('startBtn');
+            const stopBtn = document.getElementById('stopBtn');
+            const statusDot = document.getElementById('statusDot');
+            
+            if (startBtn) startBtn.disabled = false;
+            if (stopBtn) stopBtn.disabled = true;
+            if (statusDot) statusDot.classList.remove('active');
             updateLiveStatus('Feed stopped');
         }
         
@@ -593,14 +604,20 @@
             // Check if market is open for scanning (4am-8pm ET)
             if (!isMarketOpenForScanning()) {
                 updateLiveStatus('🚫 Market Closed - Scanning paused');
-                document.getElementById('statusDot').classList.remove('active');
-                document.getElementById('statusDot').classList.add('closed');
+                const statusDot = document.getElementById('statusDot');
+                if (statusDot) {
+                    statusDot.classList.remove('active');
+                    statusDot.classList.add('closed');
+                }
                 updateScanStats(0, 0);
                 return;
             }
             
-            document.getElementById('statusDot').classList.remove('closed');
-            document.getElementById('statusDot').classList.add('active');
+            const statusDot = document.getElementById('statusDot');
+            if (statusDot) {
+                statusDot.classList.remove('closed');
+                statusDot.classList.add('active');
+            }
             updateLiveStatus('🔍 Scanning for triggers...');
             
             try {
@@ -998,9 +1015,12 @@
         
         // DOM Content Loaded Event Listeners
         document.addEventListener('DOMContentLoaded', function() {
-            // Button event listeners
-            document.getElementById('startBtn').addEventListener('click', startLiveMomentumFeed);
-            document.getElementById('stopBtn').addEventListener('click', stopLiveMomentumFeed);
+            // Button event listeners with defensive checks
+            const startBtn = document.getElementById('startBtn');
+            const stopBtn = document.getElementById('stopBtn');
+            
+            if (startBtn) startBtn.addEventListener('click', startLiveMomentumFeed);
+            if (stopBtn) stopBtn.addEventListener('click', stopLiveMomentumFeed);
             
             // Load saved data on page load
             loadRunnerData();

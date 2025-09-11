@@ -418,10 +418,6 @@
                 btn.addEventListener('click', function() {
                     const filterType = this.getAttribute('data-filter');
                     filterNews(filterType);
-                    
-                    // Update active state
-                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
                 });
             });
         });
@@ -966,11 +962,13 @@
         function filterNews(type) {
             currentFilter = type;
             
-            // Update active filter button
+            // Update active filter button - find by data-filter attribute
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.classList.remove('active');
+                if (btn.getAttribute('data-filter') === type) {
+                    btn.classList.add('active');
+                }
             });
-            event.target.classList.add('active');
             
             // Re-display news with new filter
             if (allNews.length > 0) {
