@@ -1264,6 +1264,11 @@
         // Load high volume stocks
         async function loadHighVolume() {
             const container = document.getElementById('volume-content');
+            if (!container) {
+                console.warn('volume-content element not found - skipping loadHighVolume');
+                return;
+            }
+            
             container.innerHTML = `
                 <div class="loading">
                     <div class="spinner"></div>
@@ -1308,6 +1313,10 @@
         // Display stocks in grid format
         function displayStocks(stocks, containerId) {
             const container = document.getElementById(containerId);
+            if (!container) {
+                console.warn(`${containerId} element not found - skipping displayStocks`);
+                return;
+            }
             
             if (stocks.length === 0) {
                 container.innerHTML = `
@@ -2989,10 +2998,8 @@
             }
         }
         
-        // Auto-load gainers when page loads
-        window.addEventListener('load', function() {
-            loadGainers();
-        });
+        // Note: Removed auto-load of gainers to prevent errors when elements don't exist
+        // gainers will load when the user clicks the gainers tab
     </script>
 </body>
 </html>
