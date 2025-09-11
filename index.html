@@ -1726,6 +1726,13 @@
         async function scanForTriggers() {
             if (!liveFeedActive) return;
             
+            // Check if market is open for scanning (4am-8pm ET)
+            if (!isMarketOpenForScanning()) {
+                updateLiveStatus('🚫 Market Closed - Scanning paused');
+                updateScanStats(0, 0);
+                return;
+            }
+            
             updateLiveStatus('🔍 Scanning for triggers...');
             
             try {
@@ -1879,6 +1886,24 @@
             } else {
                 return 'CLOSED';
             }
+        }
+        
+        // Check if market is open for scanning (4am-8pm ET)
+        function isMarketOpenForScanning() {
+            const now = new Date();
+            const et = new Date(now.toLocaleString("en-US", {timeZone: "America/New_York"}));
+            const day = et.getDay(); // 0 = Sunday, 6 = Saturday
+            const hour = et.getHours();
+            const minute = et.getMinutes();
+            const time = hour * 100 + minute; // Convert to HHMM format
+            
+            // Weekend - closed
+            if (day === 0 || day === 6) {
+                return false;
+            }
+            
+            // Weekday 4am-8pm ET (400-2000)
+            return time >= 400 && time < 2000;
         }
         
         // Update scan statistics
