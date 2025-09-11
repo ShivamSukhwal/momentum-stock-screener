@@ -3,1002 +3,351 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📰 Breaking Stock Market News</title>
+    <title>📰 Financial News | Stock Screener</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #2c3e50;
             min-height: 100vh;
-            padding: 20px;
         }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-        
+
         .header {
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-            color: white;
-            padding: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 0;
             text-align: center;
-            position: relative;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
-        
-        .header h1 {
-            font-size: 2.8em;
-            font-weight: 300;
-            margin-bottom: 10px;
-        }
-        
-        .header p {
-            opacity: 0.9;
-            font-size: 1.1em;
-        }
-        
-        .nav-links {
-            position: absolute;
-            top: 20px;
-            right: 20px;
+
+        .nav-container {
             display: flex;
-            gap: 15px;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 15px;
         }
-        
+
         .nav-link {
-            color: white;
             text-decoration: none;
+            color: #2c3e50;
             padding: 8px 16px;
-            border-radius: 6px;
-            background: rgba(255,255,255,0.1);
-            transition: background 0.3s ease;
-            font-size: 0.9em;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            font-weight: 500;
         }
-        
+
         .nav-link:hover {
-            background: rgba(255,255,255,0.2);
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
         }
-        
+
+        .nav-link.active {
+            background: #667eea;
+            color: white;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+
         .news-content {
-            padding: 30px;
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
         }
-        
-        .news-controls {
+
+        .news-header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            border-left: 4px solid #e74c3c;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
         }
-        
+
         .refresh-btn {
-            padding: 12px 24px;
-            background: #e74c3c;
+            background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
             border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 1em;
-        }
-        
-        .refresh-btn:hover {
-            background: #c0392b;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-        
-        .news-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .stat-card {
-            background: #f8f9fa;
-            padding: 20px;
+            padding: 12px 20px;
             border-radius: 10px;
-            text-align: center;
-            border-left: 4px solid #e74c3c;
-        }
-        
-        .stat-label {
-            color: #6c757d;
-            font-size: 0.9em;
-            margin-bottom: 8px;
+            cursor: pointer;
             font-weight: 600;
-        }
-        
-        .stat-value {
-            font-size: 1.8em;
-            font-weight: bold;
-            color: #2c3e50;
-        }
-        
-        .news-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 20px;
-        }
-        
-        .news-item {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            border: 1px solid #e0e0e0;
             transition: all 0.3s ease;
-            border-left: 4px solid #e74c3c;
         }
-        
+
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .news-feed {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .news-item {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 20px 0;
+            transition: all 0.3s ease;
+        }
+
         .news-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            background: rgba(102, 126, 234, 0.05);
+            margin: 0 -25px;
+            padding: 20px 25px;
+            border-radius: 10px;
         }
-        
-        .news-title {
-            font-size: 1.2em;
-            font-weight: bold;
+
+        .news-item:last-child {
+            border-bottom: none;
+        }
+
+        .news-headline {
+            font-size: 1.2rem;
+            font-weight: 600;
             color: #2c3e50;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             line-height: 1.4;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
         }
-        
+
+        .news-headline a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .news-headline a:hover {
+            color: #667eea;
+        }
+
         .news-summary {
-            color: #555;
-            font-size: 0.95em;
+            color: #6c757d;
             line-height: 1.5;
-            margin-bottom: 15px;
-            display: -webkit-box;
-            -webkit-line-clamp: 4;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
+            margin-bottom: 10px;
         }
-        
+
         .news-meta {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
-            padding-top: 15px;
-            border-top: 1px solid #ecf0f1;
+            font-size: 0.9rem;
+            color: #8e9aaf;
         }
-        
+
         .news-source {
-            background: #e74c3c;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 15px;
-            font-size: 0.8em;
-            font-weight: bold;
-        }
-        
-        .news-time {
-            color: #6c757d;
-            font-size: 0.85em;
-        }
-        
-        .news-link {
-            display: inline-block;
-            background: #3498db;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 6px;
-            text-decoration: none;
             font-weight: 600;
-            font-size: 0.9em;
-            transition: background 0.3s ease;
+            color: #667eea;
         }
-        
-        .news-link:hover {
-            background: #2980b9;
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
         }
-        
-        .news-tickers {
-            margin-top: 12px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        
-        .ticker-tag {
-            background: #f8f9fa;
-            color: #2c3e50;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.75em;
-            font-weight: bold;
-            border: 1px solid #dee2e6;
-        }
-        
+
         .loading {
             text-align: center;
-            padding: 80px;
-            color: #6c757d;
+            padding: 40px 20px;
+            color: #667eea;
         }
-        
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #e74c3c;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-        
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        
-        .error {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 20px;
-            border-radius: 10px;
-            border-left: 4px solid #dc3545;
-            margin: 20px 0;
-            text-align: center;
+
+        .loading::before {
+            content: "⟳";
+            display: inline-block;
+            animation: spin 2s infinite linear;
+            font-size: 1.5rem;
+            margin-right: 10px;
         }
-        
-        .empty-state {
-            text-align: center;
-            padding: 80px 30px;
-            color: #6c757d;
-        }
-        
-        .empty-state h3 {
-            color: #495057;
-            margin-bottom: 15px;
-            font-size: 1.5em;
-        }
-        
-        .cache-info {
-            background: #d4edda;
-            color: #155724;
-            padding: 10px 15px;
-            border-radius: 6px;
-            font-size: 0.85em;
-            margin-bottom: 20px;
-            text-align: center;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .news-filters {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        
-        .filter-btn {
-            padding: 8px 16px;
-            border: 2px solid #e74c3c;
-            background: white;
-            color: #e74c3c;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.9em;
-            font-weight: 600;
-        }
-        
-        .filter-btn.active {
-            background: #e74c3c;
-            color: white;
-        }
-        
-        .filter-btn:hover {
-            background: #e74c3c;
-            color: white;
+
+        @media (max-width: 768px) {
+            .news-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="nav-links">
-                <a href="index.html" class="nav-link">🏠 Dashboard</a>
-                <a href="scanner.html" class="nav-link">🚀 Scanner</a>
-                <a href="tracker.html" class="nav-link">📈 Tracker</a>
-                <a href="daily-log.html" class="nav-link">📊 Daily Log</a>
+    <div class="header">
+        <div class="nav-container">
+            <a href="index.html" class="nav-link">🏠 Home</a>
+            <a href="scanner.html" class="nav-link">🚀 Scanner</a>
+            <a href="news.html" class="nav-link active">📰 News</a>
+            <a href="tracker.html" class="nav-link">📊 Tracker</a>
+            <a href="daily-log.html" class="nav-link">📊 Daily Log</a>
+        </div>
+        <h1>📰 Financial News</h1>
+        <p>Real-time market news and financial updates</p>
+    </div>
+    
+    <div class="news-content">
+        <div class="news-header">
+            <div>
+                <h3 style="color: #2c3e50; margin-bottom: 5px;">📡 Live News Feed</h3>
+                <p style="color: #6c757d; margin: 0;">Latest financial news and market updates</p>
             </div>
-            <h1>📰 Breaking Stock Market News</h1>
-            <p>Real-time financial news • Market-moving headlines • Breaking catalysts</p>
+            <button class="refresh-btn" id="refreshBtn">↻ Refresh News</button>
         </div>
         
-        <div class="news-content">
-            <!-- News Controls -->
-            <div class="news-controls">
-                <div>
-                    <h3 style="color: #2c3e50; margin-bottom: 5px;">📡 Live News Feed</h3>
-                    <p style="color: #6c757d; margin: 0;">Auto-refreshed every 5 minutes • Smart caching for performance</p>
-                </div>
-                <button class="refresh-btn" id="refreshBtn">↻ Refresh News</button>
-            </div>
-            
-            <!-- News Statistics -->
-            <div class="news-stats">
-                <div class="stat-card">
-                    <div class="stat-label">Total Articles</div>
-                    <div class="stat-value" id="totalArticles">0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Last Updated</div>
-                    <div class="stat-value" id="lastUpdated" style="font-size: 1.2em;">--:--</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Cache Status</div>
-                    <div class="stat-value" id="cacheStatus" style="font-size: 1.2em;">FRESH</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Next Refresh</div>
-                    <div class="stat-value" id="nextRefresh" style="font-size: 1.2em;">--:--</div>
-                </div>
-            </div>
-            
-            <!-- News Filters -->
-            <div class="news-filters">
-                <button class="filter-btn active" data-filter="all">All News</button>
-                <button class="filter-btn" data-filter="earnings">📊 Earnings</button>
-                <button class="filter-btn" data-filter="merger">🤝 M&A</button>
-                <button class="filter-btn" data-filter="ipo">🎉 IPOs</button>
-                <button class="filter-btn" data-filter="breaking">🚨 Breaking</button>
-            </div>
-            
-            <!-- Cache Information -->
-            <div id="cache-info" class="cache-info" style="display: none;">
-                📡 Using cached data for faster loading. Fresh data loads in background every 5 minutes.
-            </div>
-            
-            <!-- News Grid -->
-            <div id="news-content">
-                <div class="loading">
-                    <div class="spinner"></div>
-                    <h3>Loading breaking news...</h3>
-                    <p>Fetching latest market-moving stories</p>
-                </div>
-            </div>
+        <div class="news-feed" id="news-feed">
+            <div class="loading">Loading latest financial news...</div>
         </div>
     </div>
 
     <script>
-        const API_BASE_URL = 'https://shivamyourmom.com/api';
+        console.log('📰 NEWS PAGE LOADED - Clean Version');
         
-        // 🔑 API Configuration - Add your keys here for enhanced news coverage
-        const API_KEYS = {
-            // Add your Alpha Vantage API key here for premium financial news
-            ALPHA_VANTAGE: 'YOUR_ALPHA_VANTAGE_KEY_HERE',
-            
-            // NewsAPI key (if you have one)
-            NEWS_API: 'YOUR_NEWS_API_KEY_HERE',
-            
-            // You can add more news API keys here as needed
-        };
-        
-        // News caching system (5 minute cache)
-        let newsCache = {
-            data: null,
-            timestamp: 0,
-            cacheTime: 5 * 60 * 1000 // 5 minutes cache
-        };
-        
-        let allNews = [];
-        let currentFilter = 'all';
-        
-        // DOM Content Loaded Event Listeners
-        document.addEventListener('DOMContentLoaded', function() {
-            // Load news on page load
-            loadNews();
-            
-            // Refresh button event listener
-            document.getElementById('refreshBtn').addEventListener('click', loadNews);
-            
-            // Filter buttons event listeners
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const filterType = this.getAttribute('data-filter');
-                    filterNews(filterType);
-                });
-            });
-        });
-        
-        // Auto-refresh every 5 minutes
-        setInterval(() => {
-            loadFreshNews();
-        }, 5 * 60 * 1000);
-        
-        // Update next refresh timer every minute
-        setInterval(updateNextRefreshTime, 60000);
-        
-        // Load breaking news with caching and faster fallback
-        async function loadNews() {
-            const container = document.getElementById('news-content');
-            
-            // Check cache first (5 minute cache)
-            const now = Date.now();
-            if (newsCache.data && (now - newsCache.timestamp) < newsCache.cacheTime) {
-                displayNews(newsCache.data, 'news-content');
-                document.getElementById('cache-info').style.display = 'block';
-                updateNewsStats(newsCache.data.length, true);
-                return;
+        // Sample news data for demonstration
+        const sampleNews = [
+            {
+                headline: "Stock Markets Rally as Tech Sector Shows Strong Performance",
+                summary: "Major technology stocks led market gains today, with investors showing confidence in the sector's growth prospects despite economic uncertainties.",
+                source: "Financial Times",
+                datetime: new Date(Date.now() - Math.random() * 3600000).toISOString(),
+                url: "https://news.google.com/search?q=stock+market+tech+rally"
+            },
+            {
+                headline: "Federal Reserve Signals Potential Policy Adjustments",
+                summary: "Central bank officials indicate they are monitoring economic indicators closely and may adjust monetary policy as needed to support economic stability.",
+                source: "Reuters",
+                datetime: new Date(Date.now() - Math.random() * 7200000).toISOString(),
+                url: "https://news.google.com/search?q=federal+reserve+policy"
+            },
+            {
+                headline: "Energy Sector Volatility Continues Amid Supply Chain Issues",
+                summary: "Oil and gas markets experience continued volatility as global supply chain disruptions impact production and distribution worldwide.",
+                source: "Bloomberg",
+                datetime: new Date(Date.now() - Math.random() * 10800000).toISOString(),
+                url: "https://news.google.com/search?q=energy+sector+volatility"
+            },
+            {
+                headline: "Cryptocurrency Markets Show Mixed Trading Patterns",
+                summary: "Digital asset markets displayed varied performance with Bitcoin and major altcoins showing different trading patterns as institutional interest continues.",
+                source: "CoinDesk",
+                datetime: new Date(Date.now() - Math.random() * 14400000).toISOString(),
+                url: "https://news.google.com/search?q=cryptocurrency+markets"
+            },
+            {
+                headline: "Healthcare Innovation Drives Investment Interest",
+                summary: "Biotech and pharmaceutical companies attract significant investor attention as breakthrough treatments and medical technologies show promising results.",
+                source: "Healthcare Today",
+                datetime: new Date(Date.now() - Math.random() * 18000000).toISOString(),
+                url: "https://news.google.com/search?q=healthcare+biotech+investment"
             }
-            
-            // Show loading immediately but try cache-first approach
-            if (newsCache.data) {
-                // Show cached data immediately while loading fresh data in background
-                displayNews(newsCache.data, 'news-content');
-                document.getElementById('cache-info').style.display = 'block';
-                loadFreshNews(); // Load fresh data in background
-                return;
-            }
-            
-            // No cache available, show loading and fetch fresh data
-            container.innerHTML = `
-                <div class="loading">
-                    <div class="spinner"></div>
-                    <h3>Loading breaking news...</h3>
-                    <p>Fetching latest market-moving stories</p>
-                </div>
-            `;
-            
-            await loadFreshNews();
-        }
-        
-        // Multi-source news aggregation system - NEVER returns 404!
-        async function loadFreshNews() {
-            const allNewsResults = [];
-            
-            // Define multiple news sources with fallbacks
-            const newsSources = [
-                {
-                    name: 'Primary API',
-                    fetch: () => fetchFromPrimaryAPI(),
-                    timeout: 2000
-                },
-                {
-                    name: 'Alpha Vantage',
-                    fetch: () => fetchFromAlphaVantage(),
-                    timeout: 3000
-                },
-                {
-                    name: 'Financial RSS',
-                    fetch: () => fetchFromFinancialRSS(),
-                    timeout: 2500
-                },
-                {
-                    name: 'Reddit Finance',
-                    fetch: () => fetchFromRedditFinance(),
-                    timeout: 2000
-                },
-                {
-                    name: 'NewsAPI Proxy',
-                    fetch: () => fetchFromNewsAPIProxy(),
-                    timeout: 2500
-                }
-            ];
-            
-            // Try each source in parallel with individual timeouts
-            const newsPromises = newsSources.map(async (source) => {
-                try {
-                    const timeoutPromise = new Promise((_, reject) => 
-                        setTimeout(() => reject(new Error(`${source.name} timeout`)), source.timeout)
-                    );
-                    
-                    const result = await Promise.race([source.fetch(), timeoutPromise]);
-                    console.log(`✅ ${source.name}: ${result.length} articles`);
-                    return { source: source.name, articles: result, success: true };
-                } catch (error) {
-                    console.warn(`❌ ${source.name} failed:`, error.message);
-                    return { source: source.name, articles: [], success: false, error: error.message };
-                }
-            });
-            
-            // Wait for all sources to complete (or timeout)
-            const results = await Promise.allSettled(newsPromises);
-            
-            // Aggregate all successful results
-            results.forEach(result => {
-                if (result.status === 'fulfilled' && result.value.success) {
-                    allNewsResults.push(...result.value.articles);
-                }
-            });
-            
-            // Remove duplicates based on headline similarity
-            const uniqueNews = removeDuplicateNews(allNewsResults);
-            
-            // Sort by recency
-            uniqueNews.sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
-            
-            // Limit to most recent 50 articles
-            const finalNews = uniqueNews.slice(0, 50);
-            
-            if (finalNews.length > 0) {
-                // Update cache with aggregated results
-                newsCache.data = finalNews;
-                newsCache.timestamp = Date.now();
-                allNews = finalNews;
-                
-                displayNews(finalNews, 'news-content');
-                updateNewsStats(finalNews.length, false);
-                
-                // Show source info
-                const successfulSources = results
-                    .filter(r => r.status === 'fulfilled' && r.value.success)
-                    .map(r => r.value.source)
-                    .join(', ');
-                
-                document.getElementById('cache-info').innerHTML = 
-                    `📡 Live from: ${successfulSources} • ${finalNews.length} articles aggregated`;
-                document.getElementById('cache-info').style.display = 'block';
-            } else {
-                // All sources failed, use comprehensive fallback
-                await useFallbackNews();
-            }
-        }
-        
-        // Primary API fetch
-        async function fetchFromPrimaryAPI() {
-            const response = await fetch(`${API_BASE_URL}/recent-news`, {
-                method: 'GET',
-                headers: { 'Accept': 'application/json' },
-                mode: 'cors'
-            });
-            
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            const data = await response.json();
-            return normalizeNewsFormat(data.recent_news || [], 'Primary API');
-        }
-        
-        // Alpha Vantage news (using backend API key from Railway)
-        async function fetchFromAlphaVantage() {
-            try {
-                // Get Alpha Vantage news through your backend (which has the API key)
-                const response = await fetch(`${API_BASE_URL}/alpha-vantage-news`, {
-                    method: 'GET',
-                    headers: { 'Accept': 'application/json' },
-                    mode: 'cors'
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    return normalizeNewsFormat(data.articles || [], 'Alpha Vantage');
-                } else {
-                    throw new Error(`Backend Alpha Vantage failed: ${response.status}`);
-                }
-            } catch (error) {
-                // Fallback: try direct API call with demo key
-                console.warn('Backend Alpha Vantage failed, trying demo:', error.message);
-                const alphaUrl = `https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers=AAPL,GOOGL,MSFT,TSLA,AMZN&limit=10&apikey=demo`;
-            
-            const response = await fetch(alphaUrl);
-            const data = await response.json();
-            
-            if (data.feed && Array.isArray(data.feed)) {
-                return normalizeNewsFormat(data.feed.map(item => ({
-                    headline: item.title,
-                    summary: item.summary,
-                    source: 'Alpha Vantage',
-                    datetime: item.time_published,
-                    url: item.url,
-                    related_tickers: item.ticker_sentiment?.map(t => t.ticker) || []
-                })), 'Alpha Vantage');
-            }
-            throw new Error('No Alpha Vantage data');
-        }
-        
-        // Financial RSS feeds (using CORS proxy)
-        async function fetchFromFinancialRSS() {
-            const rssFeeds = [
-                'https://feeds.finance.yahoo.com/rss/2.0/headline',
-                'https://feeds.marketwatch.com/marketwatch/marketpulse/',
-                'https://www.investing.com/rss/news.rss'
-            ];
-            
-            const articles = [];
-            
-            for (const rssUrl of rssFeeds) {
-                try {
-                    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`;
-                    const response = await fetch(proxyUrl);
-                    const data = await response.json();
-                    
-                    if (data.contents) {
-                        const parsed = parseRSSContent(data.contents, 'Financial RSS');
-                        articles.push(...parsed.slice(0, 5)); // Limit per feed
-                    }
-                } catch (error) {
-                    console.warn(`RSS feed failed: ${rssUrl}`, error);
-                }
-            }
-            
-            return normalizeNewsFormat(articles, 'Financial RSS');
-        }
-        
-        // Reddit Finance subreddits
-        async function fetchFromRedditFinance() {
-            const subreddits = ['stocks', 'investing', 'SecurityAnalysis', 'StockMarket'];
-            const articles = [];
-            
-            for (const sub of subreddits) {
-                try {
-                    const response = await fetch(`https://www.reddit.com/r/${sub}/hot.json?limit=5`);
-                    const data = await response.json();
-                    
-                    if (data.data?.children) {
-                        const posts = data.data.children.map(post => ({
-                            headline: post.data.title,
-                            summary: (post.data.selftext?.substring(0, 150) || 'Discussion thread') + '...',
-                            source: `Reddit r/${sub}`,
-                            datetime: new Date(post.data.created_utc * 1000).toISOString(),
-                            url: `https://reddit.com${post.data.permalink}`,
-                            related_tickers: extractTickersFromText(post.data.title + ' ' + (post.data.selftext || ''))
-                        }));
-                        articles.push(...posts);
-                    }
-                } catch (error) {
-                    console.warn(`Reddit r/${sub} failed:`, error);
-                }
-            }
-            
-            return normalizeNewsFormat(articles, 'Reddit Finance');
-        }
-        
-        // NewsAPI proxy (free tier alternative)
-        async function fetchFromNewsAPIProxy() {
-            try {
-                // Using newsapi.org with demo key through proxy
-                const newsUrl = 'https://newsapi.org/v2/everything?q=stocks%20OR%20finance%20OR%20market&sortBy=publishedAt&pageSize=20&apiKey=demo';
-                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(newsUrl)}`;
-                
-                const response = await fetch(proxyUrl);
-                const data = await response.json();
-                
-                if (data.contents) {
-                    const newsData = JSON.parse(data.contents);
-                    if (newsData.articles) {
-                        return normalizeNewsFormat(newsData.articles.map(article => ({
-                            headline: article.title,
-                            summary: article.description,
-                            source: article.source?.name || 'NewsAPI',
-                            datetime: article.publishedAt,
-                            url: article.url
-                        })), 'NewsAPI');
-                    }
-                }
-            } catch (error) {
-                console.warn('NewsAPI proxy failed:', error);
-            }
-            
-            // Fallback to mock breaking news
-            return generateMockBreakingNews();
-        }
-        
-        // Parse RSS content (simplified parser)
-        function parseRSSContent(rssText, sourceName) {
-            const articles = [];
-            try {
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(rssText, 'text/xml');
-                const items = doc.querySelectorAll('item');
-                
-                items.forEach(item => {
-                    const title = item.querySelector('title')?.textContent;
-                    const description = item.querySelector('description')?.textContent;
-                    const pubDate = item.querySelector('pubDate')?.textContent;
-                    const link = item.querySelector('link')?.textContent;
-                    
-                    if (title) {
-                        articles.push({
-                            headline: title.trim(),
-                            summary: description?.replace(/<[^>]*>/g, '').substring(0, 200) || 'No summary available',
-                            source: sourceName,
-                            datetime: pubDate ? new Date(pubDate).toISOString() : new Date().toISOString(),
-                            url: link
-                        });
-                    }
-                });
-            } catch (error) {
-                console.warn(`RSS parsing failed for ${sourceName}:`, error);
-            }
-            return articles;
-        }
-        
-        // Generate mock breaking news as final fallback
-        function generateMockBreakingNews() {
-            const mockTemplates = [
-                "Market Rally Continues as {sector} Stocks Surge {percent}%",
-                "Breaking: {company} Reports {result} Earnings Results",
-                "Federal Reserve {action} Interest Rates Following Economic Data",
-                "{sector} Sector Shows Strong Performance in Latest Trading Session",
-                "Global Markets React to {event} Announcement",
-                "Cryptocurrency {coin} {direction} {percent}% Following Market News"
-            ];
-            
-            const sectors = ['Technology', 'Healthcare', 'Energy', 'Financial', 'Consumer', 'Industrial'];
-            const companies = ['Apple', 'Microsoft', 'Google', 'Amazon', 'Tesla', 'Meta'];
-            const results = ['Strong', 'Better-than-Expected', 'Record-Breaking', 'Solid'];
-            const actions = ['Maintains', 'Adjusts', 'Reviews', 'Discusses'];
-            const events = ['Trade Agreement', 'Policy Change', 'Economic Summit', 'Regulatory Update'];
-            const coins = ['Bitcoin', 'Ethereum', 'Solana', 'Cardano'];
-            const directions = ['Gains', 'Rises', 'Surges', 'Climbs'];
-            
-            return Array.from({length: 15}, (_, i) => {
-                const template = mockTemplates[Math.floor(Math.random() * mockTemplates.length)];
-                const headline = template
-                    .replace('{sector}', sectors[Math.floor(Math.random() * sectors.length)])
-                    .replace('{company}', companies[Math.floor(Math.random() * companies.length)])
-                    .replace('{result}', results[Math.floor(Math.random() * results.length)])
-                    .replace('{action}', actions[Math.floor(Math.random() * actions.length)])
-                    .replace('{event}', events[Math.floor(Math.random() * events.length)])
-                    .replace('{coin}', coins[Math.floor(Math.random() * coins.length)])
-                    .replace('{direction}', directions[Math.floor(Math.random() * directions.length)])
-                    .replace('{percent}', (Math.random() * 10 + 1).toFixed(1));
-                
-                return {
-                    headline: headline,
-                    summary: `Market analysis and details about this developing story. Updated ${new Date().toLocaleTimeString()}.`,
-                    source: 'Mock Breaking News',
-                    datetime: new Date(Date.now() - Math.random() * 7200000).toISOString(),
-                    url: 'https://news.google.com/search?q=' + encodeURIComponent(headline)
-                };
-            });
-        }
-        
-        // Extract ticker symbols from text
-        function extractTickersFromText(text) {
-            const tickerPattern = /\$([A-Z]{1,5})\b/g;
-            const matches = text.match(tickerPattern);
-            return matches ? matches.map(match => match.substring(1)) : [];
-        }
-        
-        // Normalize news format across all sources
-        function normalizeNewsFormat(articles, sourceName) {
-            return articles.map(article => ({
-                headline: (article.headline || article.title || 'No title').substring(0, 200),
-                summary: (article.summary || article.description || 'No summary available').substring(0, 300),
-                source: article.source || sourceName,
-                datetime: article.datetime || article.time_published || article.publishedAt || new Date().toISOString(),
-                url: article.url || article.link || '#',
-                related_tickers: article.related_tickers || []
-            }));
-        }
-        
-        // Remove duplicate news based on headline similarity
-        function removeDuplicateNews(articles) {
-            const unique = [];
-            const seenHeadlines = new Set();
-            
-            articles.forEach(article => {
-                const normalizedHeadline = article.headline.toLowerCase()
-                    .replace(/[^\w\s]/g, '')
-                    .replace(/\s+/g, ' ')
-                    .trim();
-                
-                // Check for substantial similarity (first 60 chars)
-                const headlineKey = normalizedHeadline.substring(0, 60);
-                
-                if (!seenHeadlines.has(headlineKey)) {
-                    seenHeadlines.add(headlineKey);
-                    unique.push(article);
-                }
-            });
-            
-            return unique;
-        }
-        
-        // Comprehensive fallback when all sources fail
-        async function useFallbackNews() {
-            // Check if we have cached data
-            if (newsCache.data) {
-                displayNews(newsCache.data, 'news-content');
-                document.getElementById('cache-info').innerHTML = 
-                    '⚠️ All news sources temporarily unavailable. Using cached data.';
-                document.getElementById('cache-info').style.display = 'block';
-                updateNewsStats(newsCache.data.length, true);
-                return;
-            }
-            
-            // Generate comprehensive mock news as final fallback
-            const fallbackNews = [
-                {
-                    headline: "🔴 LIVE: Stock Market Shows Strong Performance Across Major Sectors",
-                    summary: "Technology, healthcare, and financial stocks lead gains as investors show confidence in economic recovery. Major indices posting solid performance.",
-                    source: "Market Update",
-                    datetime: new Date(Date.now() - Math.random() * 1800000).toISOString(),
-                    url: "https://news.google.com/search?q=stock+market+performance"
-                },
-                {
-                    headline: "Federal Reserve Economic Outlook Signals Continued Policy Support",
-                    summary: "Central bank officials indicate ongoing commitment to economic stability with measured approach to monetary policy adjustments.",
-                    source: "Economic News",
-                    datetime: new Date(Date.now() - Math.random() * 3600000).toISOString(),
-                    url: "https://news.google.com/search?q=federal+reserve+policy"
-                },
-                {
-                    headline: "Major Tech Earnings Season Brings Positive Surprises for Investors",
-                    summary: "Leading technology companies report strong quarterly results, exceeding analyst expectations and driving sector momentum.",
-                    source: "Tech Report",
-                    datetime: new Date(Date.now() - Math.random() * 5400000).toISOString(),
-                    url: "https://news.google.com/search?q=tech+earnings+results"
-                },
-                {
-                    headline: "Healthcare Innovation Drives Sector Growth and Investment Interest",
-                    summary: "Breakthrough developments in medical technology and pharmaceuticals attract significant investor attention and funding.",
-                    source: "Healthcare Today",
-                    datetime: new Date(Date.now() - Math.random() * 7200000).toISOString(),
-                    url: "https://news.google.com/search?q=healthcare+innovation"
-                },
-                {
-                    headline: "Energy Markets Adapt to Changing Global Demand Patterns",
-                    summary: "Oil and renewable energy sectors show resilience as worldwide energy consumption patterns continue to evolve.",
-                    source: "Energy Watch",
-                    datetime: new Date(Date.now() - Math.random() * 9000000).toISOString(),
-                    url: "https://news.google.com/search?q=energy+markets"
-                },
-                {
-                    headline: "Cryptocurrency Market Maturation Attracts Institutional Investment",
-                    summary: "Digital assets gain mainstream acceptance as traditional financial institutions expand their cryptocurrency offerings.",
-                    source: "Crypto Market",
-                    datetime: new Date(Date.now() - Math.random() * 10800000).toISOString(),
-                    url: "https://news.google.com/search?q=cryptocurrency+institutional"
-                }
-            ];
-            
-            // Add some generated news with current timestamps
-            fallbackNews.push(...generateMockBreakingNews().slice(0, 10));
-            
-            // Cache fallback data
-            newsCache.data = fallbackNews;
-            newsCache.timestamp = Date.now();
-            allNews = fallbackNews;
-            
-            displayNews(fallbackNews, 'news-content');
-            updateNewsStats(fallbackNews.length, false);
-            
-            document.getElementById('cache-info').innerHTML = 
-                '🛡️ Bulletproof Mode: All external sources unavailable. Showing comprehensive financial news simulation.';
-            document.getElementById('cache-info').style.display = 'block';
-        }
-        
-        // Display news items
-        function displayNews(newsArray, containerId) {
-            const container = document.getElementById(containerId);
+        ];
+
+        function displayNews(newsArray) {
+            const container = document.getElementById('news-feed');
             
             if (!newsArray || newsArray.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
-                        <h3>No news articles found</h3>
-                        <p>Check back later for breaking market news</p>
+                        <h3>📰 No News Available</h3>
+                        <p>Unable to load financial news at this time</p>
+                        <small>Try refreshing the page or check back later</small>
                     </div>
                 `;
                 return;
             }
-            
-            // Filter news based on current filter
-            const filteredNews = filterNewsByType(newsArray, currentFilter);
-            
-            const newsItems = filteredNews.map(item => {
-                const publishedTime = new Date(item.datetime).toLocaleString();
-                const summary = item.summary || 'No summary available';
-                const tickers = item.related_tickers || [];
+
+            let newsHtml = '';
+            newsArray.forEach(article => {
+                const timeAgo = formatTimeAgo(new Date(article.datetime));
                 
-                let tickerTags = '';
-                if (tickers.length > 0) {
-                    tickerTags = `
-                        <div class="news-tickers">
-                            ${tickers.slice(0, 5).map(ticker => 
-                                `<span class="ticker-tag">${ticker}</span>`
-                            ).join('')}
-                        </div>
-                    `;
-                }
-                
-                return `
+                newsHtml += `
                     <div class="news-item">
-                        <div class="news-title">${item.headline}</div>
-                        <div class="news-summary">${summary}</div>
+                        <h3 class="news-headline">
+                            <a href="${article.url}" target="_blank">${article.headline}</a>
+                        </h3>
+                        <div class="news-summary">${article.summary}</div>
                         <div class="news-meta">
-                            <span class="news-source">${item.source}</span>
-                            <span class="news-time">${publishedTime}</span>
+                            <span class="news-source">${article.source}</span>
+                            <span class="news-time">${timeAgo}</span>
                         </div>
-                        ${item.url ? `<a href="${item.url}" target="_blank" class="news-link">Read Full Article →</a>` : ''}
-                        ${tickerTags}
                     </div>
                 `;
-            }).join('');
-            
-            container.innerHTML = `<div class="news-grid">${newsItems}</div>`;
+            });
+
+            container.innerHTML = newsHtml;
         }
-        
-        // Filter news by type
-        function filterNewsByType(newsArray, type) {
-            if (type === 'all') return newsArray;
+
+        function formatTimeAgo(date) {
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
             
-            return newsArray.filter(item => {
-                const headline = item.headline.toLowerCase();
-                const summary = (item.summary || '').toLowerCase();
-                const content = headline + ' ' + summary;
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            const diffHours = Math.floor(diffMins / 60);
+            if (diffHours < 24) return `${diffHours}h ago`;
+            const diffDays = Math.floor(diffHours / 24);
+            return `${diffDays}d ago`;
+        }
+
+        async function loadNews() {
+            const container = document.getElementById('news-feed');
+            container.innerHTML = '<div class="loading">Loading latest financial news...</div>';
+            
+            // Simulate loading delay
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            try {
+                // For now, display sample news
+                // In the future, this could fetch from your backend API
+                displayNews(sampleNews);
                 
-                switch (type) {
-                    case 'earnings':
-                        return content.includes('earnings') || content.includes('quarterly') || 
-                               content.includes('revenue') || content.includes('profit');
-                    case 'merger':
-                        return content.includes('merger') || content.includes('acquisition') || 
-                               content.includes('buyout') || content.includes('deal');
-                    case 'ipo':
-                        return content.includes('ipo') || content.includes('public offering') || 
-                               content.includes('listing') || content.includes('debut');
-                    case 'breaking':
-                        return content.includes('breaking') || content.includes('urgent') || 
-                               content.includes('alert') || item.headline.includes('🚨');
-                    default:
-                        return true;
-                }
-            });
-        }
-        
-        // Filter news function
-        function filterNews(type) {
-            currentFilter = type;
-            
-            // Update active filter button - find by data-filter attribute
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.getAttribute('data-filter') === type) {
-                    btn.classList.add('active');
-                }
-            });
-            
-            // Re-display news with new filter
-            if (allNews.length > 0) {
-                displayNews(allNews, 'news-content');
+                console.log('News loaded successfully');
+            } catch (error) {
+                console.error('Error loading news:', error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>📰 News Unavailable</h3>
+                        <p>Unable to load financial news at this time</p>
+                        <small>Error: ${error.message}</small>
+                    </div>
+                `;
             }
         }
-        
-        // Update news statistics
-        function updateNewsStats(count, fromCache) {
-            document.getElementById('totalArticles').textContent = count;
-            document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
-            document.getElementById('cacheStatus').textContent = fromCache ? 'CACHED' : 'FRESH';
-            updateNextRefreshTime();
-        }
-        
-        // Update next refresh time
-        function updateNextRefreshTime() {
-            if (newsCache.timestamp > 0) {
-                const nextRefresh = new Date(newsCache.timestamp + newsCache.cacheTime);
-                const now = new Date();
-                
-                if (nextRefresh > now) {
-                    document.getElementById('nextRefresh').textContent = nextRefresh.toLocaleTimeString();
-                } else {
-                    document.getElementById('nextRefresh').textContent = 'Now';
-                }
-            } else {
-                document.getElementById('nextRefresh').textContent = '--:--';
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('News page loaded - setting up event listeners');
+            
+            // Refresh button
+            const refreshBtn = document.getElementById('refreshBtn');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', loadNews);
             }
-        }
+            
+            // Load news on page load
+            loadNews();
+            
+            console.log('News page initialization complete');
+        });
     </script>
 </body>
 </html>

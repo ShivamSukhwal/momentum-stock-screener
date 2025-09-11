@@ -323,7 +323,7 @@
         console.log('✅ Scanner will start automatically and run continuously - NO BUTTONS!');
         
         // Global variables
-        const API_BASE_URL = 'https://shivamyourmom.com/api';
+        const API_BASE_URL = 'http://localhost:5000';
         
         let liveFeedActive = false;
         let liveFeedInterval = null;
@@ -425,22 +425,33 @@
                         scannedInThisRound++;
                         const data = await getStockData(ticker);
                         
-                        if (data && data.last_price && data.price_change_pct) {
-                            const changePct = parseFloat(data.price_change_pct);
+                        // Calculate real percentage change from open to close
+                        const realChangePct = data.open && data.close ? 
+                            ((data.close - data.open) / data.open) * 100 : 0;
+                        
+                        const adaptedData = {
+                            last_price: data.close || data.last_price,
+                            price_change_pct: realChangePct,
+                            volume: data.volume,
+                            relative_volume: data.rel_volume || 1.0
+                        };
+                        
+                        if (adaptedData.last_price) {
+                            const changePct = parseFloat(adaptedData.price_change_pct);
                             
                             // Check if this is a new significant move
                             const existingRunner = runnerHistory.find(r => r.symbol === ticker);
                             const isNewMove = !existingRunner || Math.abs(existingRunner.change_pct - changePct) >= 1.0;
                             
-                            if (meetsWarriorTradingCriteria(data, ticker) && isNewMove) {
+                            if (meetsWarriorTradingCriteria(adaptedData, ticker) && isNewMove) {
                                 const newsData = null; // Simplified for now
                                 
                                 const runner = {
                                     symbol: ticker,
-                                    price: data.last_price,
+                                    price: adaptedData.last_price,
                                     change_pct: changePct,
-                                    volume: data.volume,
-                                    rel_volume: data.relative_volume || 1.0,
+                                    volume: adaptedData.volume,
+                                    rel_volume: adaptedData.relative_volume || 1.0,
                                     timestamp: new Date(),
                                     is_new_move: isNewMove,
                                     category: getRunnerCategory(changePct),
@@ -462,8 +473,8 @@
                                 runnerHistory.forEach(existingRunner => {
                                     if (existingRunner.symbol === ticker && !existingRunner.is_new_move) {
                                         existingRunner.price_movements = existingRunner.price_movements || [];
-                                        const currentPrice = data.last_price;
-                                        const currentChangePct = data.price_change_pct;
+                                        const currentPrice = adaptedData.last_price;
+                                        const currentChangePct = adaptedData.price_change_pct;
                                         
                                         existingRunner.price_movements.push({
                                             price: currentPrice,
@@ -696,7 +707,9 @@
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 2000); // 2 second timeout
                 
-                const response = await fetch(`${API_BASE_URL}/stock-data/${ticker}`, {
+                const url = `${API_BASE_URL}/stock?ticker=${ticker}`;
+                console.log(`Fetching: ${url}`);
+                const response = await fetch(url, {
                     signal: controller.signal,
                     headers: { 'Accept': 'application/json' }
                 });
@@ -740,7 +753,7 @@
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 1000);
                 
-                const response = await fetch(`${API_BASE_URL}/daily-stats`, {
+                const response = await fetch(`${API_BASE_URL}/daily-summary?date=${new Date().toISOString().split('T')[0]}`, {
                     signal: controller.signal,
                     headers: { 'Accept': 'application/json' }
                 });
