@@ -889,8 +889,12 @@
                         <span class="criteria-value">Good momentum build - solid moves worth monitoring closely</span>
                     </div>
                     <div class="criteria-item">
-                        <span class="criteria-label">🏃 RUNNER (3-9.9%+):</span>
-                        <span class="criteria-value">Early momentum stage - building potential for larger moves</span>
+                        <span class="criteria-label">🏃 RUNNER (1.5%+):</span>
+                        <span class="criteria-value">Early momentum - catches squeezes as they start</span>
+                    </div>
+                    <div class="criteria-item">
+                        <span class="criteria-label">⚡ SQUEEZE DETECTION:</span>
+                        <span class="criteria-value">Volume spikes 3x+ with 1%+ moves trigger alerts instantly</span>
                     </div>
                 </div>
             </div>
@@ -1513,7 +1517,7 @@
                 if (liveFeedActive) {
                     scanForTriggers();
                 }
-            }, 15000); // 15 seconds for real-time updates
+            }, 10000); // 10 seconds for ultra-fast detection
             
             // Update daily stats every 5 minutes
             setInterval(loadDailyStats, 300000); // 5 minutes
@@ -1542,8 +1546,8 @@
                 // Randomize order to scan different stocks each time
                 const shuffledTickers = [...WARRIOR_TICKERS].sort(() => Math.random() - 0.5);
                 
-                // Scan more stocks per cycle with faster refresh (50 stocks every 15 seconds)
-                const subsetsToScan = shuffledTickers.slice(0, 50);
+                // Scan ALL stocks every cycle for maximum coverage (no limits)
+                const subsetsToScan = shuffledTickers; // Scan entire universe every 10 seconds
                 
                 for (const ticker of subsetsToScan) {
                     if (!liveFeedActive) break; // Stop if feed was disabled
@@ -1915,27 +1919,40 @@
             const newsData = await checkBreakingNews(ticker);
             const hasBreakingNews = newsData && newsData.recent_news && newsData.recent_news.length > 0;
             
-            // Basic requirements (always required)
+            // Ultra-aggressive criteria to catch early squeezes
             const basicCriteria = {
-                priceRange: price >= 0.50 && price <= 50.0,     // $0.50-$50 broader range
-                minimumVolume: volume >= 50000,                  // Lower minimum for news stocks
-                floatSize: calculateFloat(data) <= 100           // <100M float (estimated)
+                priceRange: price >= 0.10 && price <= 100.0,    // Wider range: $0.10-$100 (catch penny & big caps)
+                minimumVolume: volume >= 10000,                  // Very low minimum volume threshold
+                floatSize: calculateFloat(data) <= 500           // Larger float allowance
             };
             
-            // If stock has breaking news, relax other criteria
+            // Volume spike detection (catches early momentum)
+            const hasVolumeSjpike = relVolume >= 3.0;            // 3x+ volume spike
+            const hasSignificantMove = Math.abs(changePct) >= 2.0; // 2%+ move in either direction
+            
+            // If stock has breaking news, very relaxed criteria
             if (hasBreakingNews) {
                 const newsCriteria = {
-                    percentGainer: Math.abs(changePct) >= 1.0,   // 1%+ move (up or down) with news
-                    volumeRequirement: relVolume >= 1.0,         // Any above-average volume
+                    percentGainer: Math.abs(changePct) >= 0.5,   // 0.5%+ move with news
+                    volumeRequirement: relVolume >= 0.8,         // Even below-average volume OK with news
                 };
                 return Object.values({...basicCriteria, ...newsCriteria}).every(met => met === true);
             }
             
-            // Standard Warrior Trading "Running Up" criteria (no news)
+            // Volume spike detection (Ross Cameron style - catch the squeeze early)
+            if (hasVolumeSjpike) {
+                const volumeCriteria = {
+                    percentGainer: Math.abs(changePct) >= 1.0,   // 1%+ move with volume spike
+                    volumeRequirement: relVolume >= 3.0,         // 3x+ volume requirement
+                };
+                return Object.values({...basicCriteria, ...volumeCriteria}).every(met => met === true);
+            }
+            
+            // Standard aggressive criteria (much lower than before)
             const standardCriteria = {
-                percentGainer: changePct >= 3.0,                 // 3%+ daily gainers
-                volumeRequirement: relVolume >= 1.5,             // 1.5x+ relative volume
-                minimumVolume: volume >= 100000,                 // 100k+ shares traded
+                percentGainer: changePct >= 1.5,                 // 1.5%+ daily gainers (was 3%)
+                volumeRequirement: relVolume >= 1.2,             // 1.2x+ relative volume (was 1.5x)
+                minimumVolume: volume >= 25000,                  // 25k+ shares traded (was 100k)
             };
             
             return Object.values({...basicCriteria, ...standardCriteria}).every(met => met === true);
