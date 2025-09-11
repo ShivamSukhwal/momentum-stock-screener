@@ -231,6 +231,143 @@
             color: #2c3e50;
         }
 
+        /* Momentum Bar Styles */
+        .momentum-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            width: 100%;
+            text-align: center;
+            padding: 0 8px;
+        }
+
+        .momentum-bar-bg {
+            width: 100%;
+            height: 14px;
+            background-color: #e9ecef;
+            border-radius: 7px;
+            overflow: hidden;
+            border: 1px solid #dee2e6;
+            position: relative;
+            margin: 0 auto;
+        }
+
+        .momentum-bar-fill {
+            height: 100%;
+            border-radius: 6px;
+            transition: all 0.5s ease;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .momentum-very-bullish {
+            animation: pulse-green 1.5s infinite;
+        }
+
+        .momentum-very-bearish {
+            animation: pulse-red 1.5s infinite;
+        }
+
+        @keyframes pulse-green {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        @keyframes pulse-red {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .momentum-score {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .momentum-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .momentum-very-bullish .momentum-label {
+            color: #00ff00;
+        }
+
+        .momentum-bullish .momentum-label {
+            color: #28a745;
+        }
+
+        .momentum-neutral-bull .momentum-label {
+            color: #ffc107;
+        }
+
+        .momentum-neutral .momentum-label {
+            color: #6c757d;
+        }
+
+        .momentum-neutral-bear .momentum-label {
+            color: #fd7e14;
+        }
+
+        .momentum-bearish .momentum-label {
+            color: #dc3545;
+        }
+
+        .momentum-very-bearish .momentum-label {
+            color: #8b0000;
+        }
+
+        /* News Cell Styles */
+        .news-cell {
+            max-width: 200px;
+            font-size: 0.8rem;
+            line-height: 1.2;
+            color: #495057;
+        }
+
+        .news-link {
+            color: #007bff;
+            text-decoration: none;
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: color 0.2s;
+        }
+
+        .news-link:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .news-time {
+            font-size: 0.7rem;
+            color: #6c757d;
+            margin-top: 2px;
+        }
+
+        .tracker-btn {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .tracker-btn:hover {
+            background: linear-gradient(135deg, #0056b3, #004085);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
         @media (max-width: 768px) {
             .scanner-controls {
                 flex-direction: column;
@@ -247,7 +384,101 @@
             }
 
             .runner-table {
-                min-width: 600px;
+                min-width: 800px; /* Increased for momentum bars */
+            }
+
+            .momentum-container {
+                min-width: 60px;
+            }
+
+            .momentum-bar-bg {
+                width: 50px;
+                height: 10px;
+            }
+        }
+
+        /* Ultrawide Monitor Optimizations (2560px and wider) */
+        @media (min-width: 2560px) {
+            .scanner-content {
+                max-width: 2200px; /* Increased for ultrawide */
+                padding: 0 40px;
+            }
+
+            .runner-table th,
+            .runner-table td {
+                padding: 15px 25px; /* More generous padding */
+            }
+
+            .runner-table th {
+                font-size: 1.1rem;
+            }
+
+            .momentum-container {
+                min-width: 120px; /* Wider momentum bars */
+            }
+
+            .momentum-bar-bg {
+                width: 100px; /* Much wider momentum bars */
+                height: 18px; /* Taller bars */
+            }
+
+            .momentum-score {
+                font-size: 0.85rem;
+            }
+
+            .tracker-btn {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+                min-width: 120px;
+            }
+
+            /* Better spacing for ultrawide */
+            .scanner-controls {
+                padding: 35px 40px;
+                margin-bottom: 35px;
+            }
+
+            /* Larger status indicators */
+            .status-indicator {
+                font-size: 1.1rem;
+            }
+        }
+
+        /* Super Ultrawide (3440px and wider) */
+        @media (min-width: 3440px) {
+            .scanner-content {
+                max-width: 2800px;
+                padding: 0 60px;
+            }
+
+            .runner-table {
+                font-size: 1.05rem;
+            }
+
+            .runner-table th,
+            .runner-table td {
+                padding: 18px 30px;
+            }
+
+            .momentum-container {
+                min-width: 140px;
+            }
+
+            .momentum-bar-bg {
+                width: 120px;
+                height: 20px;
+            }
+
+            .tracker-btn {
+                min-width: 140px;
+                padding: 10px 20px;
+                font-size: 1rem;
+            }
+
+            /* Even more generous spacing */
+            .scanner-controls {
+                padding: 40px 50px;
+                margin-bottom: 40px;
             }
         }
     </style>
@@ -262,7 +493,7 @@
             <a href="daily-log.html" class="nav-link">📊 Daily Log</a>
         </div>
         <h1>🚀 Always-On Momentum Scanner</h1>
-        <p>Continuous real-time stock momentum detection • Auto-scanning 24/7 • Ross Cameron style</p>
+        <p>Continuous real-time stock momentum detection • Auto-scanning 24/7 • Professional grade</p>
     </div>
     
     <div class="scanner-content">
@@ -324,6 +555,7 @@
         
         // Global variables
         const API_BASE_URL = 'http://localhost:5000';
+        const POLYGON_API_KEY = 'r8J6hiMCpB6cmbPupSTXY9HOO5olfCtH';
         
         let liveFeedActive = false;
         let liveFeedInterval = null;
@@ -377,14 +609,14 @@
             // Start first scan immediately
             scanForTriggers();
             
-            // Set up continuous scanning every 5 seconds
+            // Set up continuous scanning every 1 second (MAXIMUM SPEED!)
             if (liveFeedInterval) clearInterval(liveFeedInterval);
             liveFeedInterval = setInterval(() => {
                 scanForTriggers();
-            }, 5000);
+            }, 1000);
         }
 
-        // Core scanning function
+        // Core scanning function - Now discovers ALL market movers dynamically!
         async function scanForTriggers() {
             if (!liveFeedActive) return;
             
@@ -405,45 +637,42 @@
                 statusDot.classList.remove('closed');
                 statusDot.classList.add('active');
             }
-            updateLiveStatus('🔍 Scanning for triggers...');
+            updateLiveStatus('🔍 Discovering live market movers...');
             
             try {
                 let scannedInThisRound = 0;
                 let triggersFound = 0;
                 
-                // High-momentum tickers to scan
-                const MOMENTUM_TICKERS = [
-                    'AAPL', 'TSLA', 'NVDA', 'AMD', 'MSFT', 'GOOGL', 'AMZN', 'META',
-                    'NFLX', 'CRM', 'ORCL', 'ADBE', 'NOW', 'SNOW', 'PLTR', 'SOFI',
-                    'GME', 'AMC', 'BBBY', 'SPCE', 'RIVN', 'LCID', 'MULN', 'SNDL'
-                ];
-
-                for (const ticker of MOMENTUM_TICKERS) {
-                    if (!liveFeedActive) break; // Stop if scanning was turned off
+                // Get REAL market gainers and losers from Polygon API directly
+                const marketMovers = await getMarketMovers();
+                
+                if (marketMovers && marketMovers.length > 0) {
+                    console.log(`🚀 Found ${marketMovers.length} market movers to analyze`);
+                    scannedInThisRound = marketMovers.length;
                     
-                    try {
-                        scannedInThisRound++;
-                        const data = await getStockData(ticker);
+                    for (const mover of marketMovers) {
+                        if (!liveFeedActive) break;
                         
-                        // Calculate real percentage change from open to close
-                        const realChangePct = data.open && data.close ? 
-                            ((data.close - data.open) / data.open) * 100 : 0;
+                        const ticker = mover.ticker;
+                        const changePct = mover.change_pct;
+                        const absChangePct = Math.abs(changePct);
                         
-                        const adaptedData = {
-                            last_price: data.close || data.last_price,
-                            price_change_pct: realChangePct,
-                            volume: data.volume,
-                            relative_volume: data.rel_volume || 1.0
-                        };
-                        
-                        if (adaptedData.last_price) {
-                            const changePct = parseFloat(adaptedData.price_change_pct);
+                        // Only process significant movers (1%+ change)
+                        if (absChangePct >= 1.0) {
+                            console.log(`🔥 Analyzing mover: ${ticker} ${changePct > 0 ? '+' : ''}${changePct.toFixed(2)}%`);
+                            
+                            const adaptedData = {
+                                last_price: mover.price,
+                                price_change_pct: changePct,
+                                volume: mover.volume,
+                                relative_volume: 2.0 // Market movers have high relative volume by definition
+                            };
                             
                             // Check if this is a new significant move
                             const existingRunner = runnerHistory.find(r => r.symbol === ticker);
-                            const isNewMove = !existingRunner || Math.abs(existingRunner.change_pct - changePct) >= 1.0;
+                            const isNewMove = !existingRunner || Math.abs(existingRunner.change_pct - changePct) >= 0.5;
                             
-                            if (meetsWarriorTradingCriteria(adaptedData, ticker) && isNewMove) {
+                            if (meetsTradingCriteria(adaptedData, ticker) && isNewMove) {
                                 const newsData = null; // Simplified for now
                                 
                                 const runner = {
@@ -451,13 +680,14 @@
                                     price: adaptedData.last_price,
                                     change_pct: changePct,
                                     volume: adaptedData.volume,
-                                    rel_volume: adaptedData.relative_volume || 1.0,
+                                    rel_volume: adaptedData.relative_volume,
                                     timestamp: new Date(),
                                     is_new_move: isNewMove,
                                     category: getRunnerCategory(changePct),
                                     news_summary: newsData?.title || '',
                                     last_updated: new Date().toISOString(),
-                                    price_movements: []
+                                    price_movements: [],
+                                    mover_type: mover.type // 'gainer' or 'loser'
                                 };
                                 
                                 // Add to history (keep most recent 50)
@@ -469,49 +699,33 @@
                                 // Save to localStorage
                                 saveRunnerData();
                                 
-                                // Track price movements for existing runners
-                                runnerHistory.forEach(existingRunner => {
-                                    if (existingRunner.symbol === ticker && !existingRunner.is_new_move) {
-                                        existingRunner.price_movements = existingRunner.price_movements || [];
-                                        const currentPrice = adaptedData.last_price;
-                                        const currentChangePct = adaptedData.price_change_pct;
-                                        
-                                        existingRunner.price_movements.push({
-                                            price: currentPrice,
-                                            change_pct: currentChangePct,
-                                            timestamp: new Date()
-                                        });
-                                    }
-                                });
-                                
-                                // Play alert for new hot runners or significant moves
+                                // Play alert for new hot runners
                                 const isNewHotRunner = runner.category.sound;
                                 if (isNewHotRunner && audioEnabled) {
                                     playAlert(runner.category.level === 'explosive' ? 1000 : 800, 300);
                                 }
                                 
-                                // Log to backend (simplified)
+                                // Log to backend
                                 logScannerHit({
                                     ticker: ticker,
-                                    trigger_type: runner.is_new_move ? 'price_move_' + runner.category.level : 'running_up_' + runner.category.level,
+                                    trigger_type: `market_${mover.type}_` + runner.category.level,
                                     price: runner.price,
                                     change_pct: runner.change_pct,
                                     volume: runner.volume,
                                     rel_volume: runner.rel_volume,
                                     breakout_detected: false,
                                     news_detected: !!newsData,
-                                    momentum_score: 75
+                                    momentum_score: Math.min(100, Math.floor(absChangePct * 10))
                                 });
                                 
                                 triggersFound++;
                                 
-                                // Small delay between requests
-                                await new Promise(resolve => setTimeout(resolve, 200));
+                                // No delay - MAXIMUM SPEED!
                             }
                         }
-                    } catch (error) {
-                        console.warn(`Error scanning ${ticker}:`, error);
                     }
+                } else {
+                    console.log('⚠️ No market movers found or API unavailable');
                 }
                 
                 // Update the runner table
@@ -574,6 +788,18 @@
                 const changeClass = runner.change_pct >= 0 ? 'positive' : 'negative';
                 const changeSymbol = runner.change_pct >= 0 ? '+' : '';
                 
+                // Calculate momentum score (1-100 scale)
+                const momentumScore = calculateMomentumScore(runner.change_pct);
+                const momentumBar = createMomentumBar(momentumScore);
+                
+                // Get actual timestamp
+                const actualTime = new Date().toLocaleTimeString('en-US', { 
+                    hour12: false, 
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    second: '2-digit' 
+                });
+                
                 tableRows += `
                     <tr>
                         <td><strong>${runner.symbol}</strong></td>
@@ -581,8 +807,10 @@
                         <td class="${changeClass}">${changeSymbol}${runner.change_pct.toFixed(2)}%</td>
                         <td>${formatVolume(runner.volume)}</td>
                         <td>${runner.rel_volume.toFixed(1)}x</td>
-                        <td><span class="momentum-badge momentum-${runner.category.level}">${runner.category.label}</span></td>
-                        <td>${formatTimeAgo(runner.timestamp)}</td>
+                        <td>${formatFloat(runner.float)}</td>
+                        <td>${momentumBar}</td>
+                        <td class="news-cell">${runner.latestNews || 'Loading...'}</td>
+                        <td>${actualTime}</td>
                     </tr>
                 `;
             });
@@ -596,7 +824,9 @@
                             <th>Change</th>
                             <th>Volume</th>
                             <th>Rel Vol</th>
-                            <th>Momentum</th>
+                            <th>Float</th>
+                            <th style="text-align: center;">Momentum</th>
+                            <th>Tracker</th>
                             <th>Time</th>
                         </tr>
                     </thead>
@@ -612,6 +842,14 @@
             if (volume >= 1000000) return (volume / 1000000).toFixed(1) + 'M';
             if (volume >= 1000) return (volume / 1000).toFixed(1) + 'K';
             return volume.toString();
+        }
+
+        function formatFloat(floatValue) {
+            if (!floatValue || floatValue === 0) return 'N/A';
+            if (floatValue >= 1000000000) return (floatValue / 1000000000).toFixed(1) + 'B';
+            if (floatValue >= 1000000) return (floatValue / 1000000).toFixed(1) + 'M';
+            if (floatValue >= 1000) return (floatValue / 1000).toFixed(1) + 'K';
+            return floatValue.toFixed(0);
         }
 
         function formatTimeAgo(date) {
@@ -634,21 +872,69 @@
             return { level: 'moderate', label: 'Momentum', sound: false };
         }
 
+        function calculateMomentumScore(changePct) {
+            // Convert percentage change to 1-100 scale
+            // 1 = Extremely Bearish (-100% or worse)
+            // 50 = Neutral (0%)  
+            // 100 = Extremely Bullish (+100% or better)
+            
+            const clampedChange = Math.max(-100, Math.min(100, changePct));
+            return Math.round(50 + (clampedChange * 0.5));
+        }
+
+        function createMomentumBar(score) {
+            // Create smooth color spectrum from red (1) to green (100)
+            // Using HSL: Red = 0°, Green = 120°
+            const clampedScore = Math.max(1, Math.min(100, score));
+            const hue = (clampedScore - 1) * 120 / 99; // Map 1-100 to 0-120 degrees
+            const saturation = 85; // High saturation for vivid colors
+            const lightness = 50; // Medium lightness
+            const barColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+            
+            // Determine label based on score
+            let label = 'BEAR--';
+            if (score >= 80) {
+                label = 'BULL++';
+            } else if (score >= 65) {
+                label = 'BULL+';
+            } else if (score >= 55) {
+                label = 'BULL';
+            } else if (score >= 45) {
+                label = 'FLAT';
+            } else if (score >= 35) {
+                label = 'BEAR';
+            } else if (score >= 20) {
+                label = 'BEAR-';
+            }
+            
+            return `
+                <div class="momentum-container" title="Momentum Score: ${score}/100">
+                    <div class="momentum-bar-bg">
+                        <div class="momentum-bar-fill" style="width: ${score}%; background-color: ${barColor}; transition: all 0.3s ease;"></div>
+                    </div>
+                    <span class="momentum-score">${score}</span>
+                    <small class="momentum-label">${label}</small>
+                </div>
+            `;
+        }
+
         function calculateFloat(data) {
             return data.shares_outstanding || 50000000; // Default to 50M if not available
         }
 
-        function meetsWarriorTradingCriteria(data, ticker) {
+        function meetsTradingCriteria(data, ticker) {
             const changePct = Math.abs(parseFloat(data.price_change_pct));
             const price = parseFloat(data.last_price);
             const volume = parseInt(data.volume || 0);
             const relVolume = parseFloat(data.relative_volume || 1.0);
             
-            // Basic momentum criteria
-            const hasSignificantMove = changePct >= 2.0; // 2% minimum move
+            // More lenient momentum criteria for testing
+            const hasSignificantMove = changePct >= 1.0; // 1% minimum move
             const hasGoodPrice = price >= 1.0 && price <= 1000; // Price range
-            const hasVolume = volume > 100000; // Minimum volume
-            const hasRelVolume = relVolume >= 1.2; // At least 20% above average
+            const hasVolume = volume > 10000; // Lower minimum volume
+            const hasRelVolume = relVolume >= 0.8; // More lenient relative volume
+            
+            console.log(`${ticker}: move=${changePct.toFixed(2)}% price=$${price} vol=${volume} relVol=${relVolume}x - Pass: ${hasSignificantMove && hasGoodPrice && hasVolume && hasRelVolume}`);
             
             return hasSignificantMove && hasGoodPrice && hasVolume && hasRelVolume;
         }
@@ -676,6 +962,96 @@
             } catch (error) {
                 console.warn('Audio alert failed:', error);
             }
+        }
+
+        // Enrich movers with float and tracker links
+        async function enrichMoversData(movers) {
+            console.log('📊 Enriching movers with float data and tracker links...');
+            
+            // Process movers in batches to avoid overwhelming APIs
+            for (let i = 0; i < movers.length; i += 3) {
+                const batch = movers.slice(i, i + 3);
+                await Promise.allSettled(batch.map(async (mover) => {
+                    try {
+                        // Set tracker link immediately (synchronous)
+                        mover.latestNews = createTrackerLink(mover.ticker);
+                        
+                        // Get float data from Polygon API
+                        const floatResult = await fetchStockFloat(mover.ticker);
+                        if (floatResult && floatResult > 0) {
+                            mover.float = floatResult;
+                        } else {
+                            mover.float = 0; // Default if API fails
+                        }
+                    } catch (error) {
+                        console.warn(`Error enriching ${mover.ticker}:`, error);
+                        mover.latestNews = createTrackerLink(mover.ticker);
+                        mover.float = 0;
+                    }
+                }));
+                
+                // Small delay between batches
+                if (i + 3 < movers.length) {
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                }
+            }
+        }
+
+        // Fetch stock float data
+        async function fetchStockFloat(ticker) {
+            try {
+                // Try multiple Polygon API endpoints for float data
+                const endpoints = [
+                    `https://api.polygon.io/v3/reference/tickers/${ticker}?apikey=${POLYGON_API_KEY}`,
+                    `https://api.polygon.io/v1/meta/symbols/${ticker}/company?apikey=${POLYGON_API_KEY}`
+                ];
+                
+                for (const endpoint of endpoints) {
+                    try {
+                        const response = await fetch(endpoint, {
+                            mode: 'cors',
+                            headers: { 'Accept': 'application/json' }
+                        });
+                        
+                        if (response.ok) {
+                            const data = await response.json();
+                            
+                            // Check different possible float fields
+                            const floatValue = data.results?.share_class_shares_outstanding 
+                                || data.results?.shares_outstanding 
+                                || data.results?.weighted_shares_outstanding
+                                || data.shares_outstanding
+                                || data.shareClassSharesOutstanding
+                                || 0;
+                            
+                            if (floatValue && floatValue > 0) {
+                                console.log(`Float for ${ticker}: ${floatValue}`);
+                                return floatValue;
+                            }
+                        }
+                    } catch (endpointError) {
+                        console.warn(`Error with endpoint for ${ticker}:`, endpointError);
+                        continue;
+                    }
+                }
+                
+                // If both endpoints fail, return 0 (no fake data)
+                console.log(`No float data available for ${ticker}`);
+                return 0;
+                
+            } catch (error) {
+                console.warn(`Error fetching float for ${ticker}:`, error);
+            }
+            return 0; // No fake data
+        }
+
+        // Create ticker tracker button
+        function createTrackerLink(ticker) {
+            return `
+                <button onclick="window.open('tracker.html?ticker=${ticker}', '_blank')" class="tracker-btn" title="View ${ticker} in Tracker">
+                    📊 ${ticker}
+                </button>
+            `;
         }
 
         function saveRunnerData() {
@@ -729,6 +1105,210 @@
                     console.warn(`Network error for ${ticker}:`, error.message);
                 }
                 return null;
+            }
+        }
+
+        async function getMarketMovers() {
+            try {
+                // Call Polygon API directly since backend routing has issues
+                console.log('🔍 Fetching REAL market gainers directly from Polygon API...');
+                
+                let allMovers = [];
+                
+                // Get gainers
+                try {
+                    const gainersUrl = `https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/gainers?apikey=${POLYGON_API_KEY}`;
+                    const gainersResponse = await fetch(gainersUrl, { 
+                        mode: 'cors',
+                        headers: { 'Accept': 'application/json' }
+                    });
+                    
+                    if (gainersResponse.ok) {
+                        const gainersData = await gainersResponse.json();
+                        if (gainersData.tickers) {
+                            gainersData.tickers.slice(0, 15).forEach(stock => {
+                                if (stock.ticker && stock.ticker.length <= 5) {
+                                    allMovers.push({
+                                        ticker: stock.ticker,
+                                        price: stock.lastTrade?.p || stock.day?.c || 0,
+                                        change_pct: stock.todaysChangePerc || 0,
+                                        volume: stock.day?.v || 0,
+                                        float: 0, // Will be fetched from API
+                                        latestNews: `<button onclick="window.open('tracker.html?ticker=${stock.ticker}', '_blank')" class="tracker-btn">📊 ${stock.ticker}</button>`,
+                                        type: 'gainer'
+                                    });
+                                }
+                            });
+                        }
+                    }
+                } catch (error) {
+                    console.warn('Error fetching gainers:', error.message);
+                }
+                
+                // Get losers  
+                try {
+                    const losersUrl = `https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/losers?apikey=${POLYGON_API_KEY}`;
+                    const losersResponse = await fetch(losersUrl, { 
+                        mode: 'cors',
+                        headers: { 'Accept': 'application/json' }
+                    });
+                    
+                    if (losersResponse.ok) {
+                        const losersData = await losersResponse.json();
+                        if (losersData.tickers) {
+                            losersData.tickers.slice(0, 15).forEach(stock => {
+                                if (stock.ticker && stock.ticker.length <= 5) {
+                                    allMovers.push({
+                                        ticker: stock.ticker,
+                                        price: stock.lastTrade?.p || stock.day?.c || 0,
+                                        change_pct: stock.todaysChangePerc || 0,
+                                        volume: stock.day?.v || 0,
+                                        float: 0, // Will be fetched from API
+                                        latestNews: `<button onclick="window.open('tracker.html?ticker=${stock.ticker}', '_blank')" class="tracker-btn">📊 ${stock.ticker}</button>`,
+                                        type: 'loser'
+                                    });
+                                }
+                            });
+                        }
+                    }
+                } catch (error) {
+                    console.warn('Error fetching losers:', error.message);
+                }
+                
+                // Sort by absolute change percentage (biggest movers first)
+                allMovers.sort((a, b) => Math.abs(b.change_pct) - Math.abs(a.change_pct));
+                
+                console.log(`🚀 SUCCESS: Found ${allMovers.length} REAL market movers!`);
+                console.log(`Top 5 movers:`, allMovers.slice(0, 5).map(m => 
+                    `${m.ticker}: ${m.change_pct > 0 ? '+' : ''}${m.change_pct.toFixed(2)}%`
+                ));
+                
+                // Return top movers first, then enrich in background
+                const topMovers = allMovers.slice(0, 30);
+                
+                // Enrich data in background and update display
+                enrichMoversData(topMovers).then(() => {
+                    updateRunnerDisplay();
+                });
+                
+                return topMovers; // Return top 30 movers
+                
+            } catch (error) {
+                console.error('❌ Direct Polygon API failed:', error.message);
+                return [];
+            }
+        }
+
+        async function getFallbackMovers() {
+            // Fallback: Use a curated list of high-volume, volatile stocks
+            const volatileStocks = [
+                'TSLA', 'GME', 'AMC', 'NVDA', 'AMD', 'PLTR', 'SOFI', 'RIVN', 'LCID',
+                'SPCE', 'BBBY', 'MULN', 'SNDL', 'AAPL', 'MSFT', 'GOOGL', 'META',
+                'NFLX', 'AMZN', 'SPY', 'QQQ', 'IWM', 'ARKK', 'COIN', 'SHOP',
+                'UBER', 'LYFT', 'ZOOM', 'DOCU', 'CRM', 'NOW', 'SNOW', 'ROKU'
+            ];
+            
+            try {
+                // Get data for volatile stocks in batches
+                const batchSize = 10;
+                let allMovers = [];
+                
+                for (let i = 0; i < volatileStocks.length; i += batchSize) {
+                    const batch = volatileStocks.slice(i, i + batchSize);
+                    const batchData = await getMultipleStocks(batch);
+                    
+                    if (batchData && batchData.length > 0) {
+                        batchData.forEach(stock => {
+                            if (stock.open && stock.close) {
+                                const changePct = ((stock.close - stock.open) / stock.open) * 100;
+                                const absChange = Math.abs(changePct);
+                                
+                                // Only include stocks with significant moves
+                                if (absChange >= 1.0) {
+                                    allMovers.push({
+                                        ticker: stock.ticker,
+                                        price: stock.close,
+                                        change_pct: changePct,
+                                        volume: stock.volume || 0,
+                                        float: 0, // Will be fetched from API
+                                        latestNews: `<button onclick="window.open('tracker.html?ticker=${stock.ticker}', '_blank')" class="tracker-btn">📊 ${stock.ticker}</button>`,
+                                        type: changePct >= 0 ? 'gainer' : 'loser'
+                                    });
+                                }
+                            }
+                        });
+                    }
+                    
+                    // Small delay between batches
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                }
+                
+                // Sort by absolute change percentage
+                allMovers.sort((a, b) => Math.abs(b.change_pct) - Math.abs(a.change_pct));
+                
+                console.log(`📊 Fallback Discovery: Found ${allMovers.length} movers from volatile stocks`);
+                
+                // Return top movers first, then enrich in background
+                const topMovers = allMovers.slice(0, 30);
+                
+                // Enrich data in background and update display
+                enrichMoversData(topMovers).then(() => {
+                    updateRunnerDisplay();
+                });
+                
+                return topMovers; // Return top 30 movers
+                
+            } catch (error) {
+                console.error('Fallback movers discovery failed:', error);
+                return [];
+            }
+        }
+
+        async function getMultipleStocks(tickers) {
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout for batch
+                
+                const tickerString = tickers.join(',');
+                const url = `${API_BASE_URL}/stocks?tickers=${tickerString}`;
+                console.log(`Batch fetching: ${tickers.length} stocks`);
+                
+                const response = await fetch(url, {
+                    signal: controller.signal,
+                    headers: { 'Accept': 'application/json' }
+                });
+                
+                clearTimeout(timeoutId);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Convert object format to array format
+                    if (data && typeof data === 'object' && !Array.isArray(data)) {
+                        return Object.keys(data).map(ticker => ({
+                            ticker: ticker,
+                            close: data[ticker].close,
+                            open: data[ticker].open,
+                            high: data[ticker].high,
+                            low: data[ticker].low,
+                            volume: data[ticker].volume,
+                            last_price: data[ticker].close
+                        }));
+                    }
+                    
+                    // Handle array response
+                    return Array.isArray(data) ? data : (data.stocks || []);
+                } else {
+                    console.warn(`Batch API error: ${response.status}`);
+                    return [];
+                }
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    console.warn('Batch request timeout');
+                } else {
+                    console.warn(`Batch network error:`, error.message);
+                }
+                return [];
             }
         }
 
