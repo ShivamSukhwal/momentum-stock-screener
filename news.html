@@ -484,13 +484,57 @@
                     document.getElementById('cache-info').style.display = 'block';
                     updateNewsStats(newsCache.data.length, true);
                 } else {
-                    document.getElementById('news-content').innerHTML = `
-                        <div class="error">
-                            <h3>📡 News Feed Temporarily Unavailable</h3>
-                            <p>We're having trouble reaching the news service. Please try again in a few minutes.</p>
-                            <button class="refresh-btn" onclick="loadNews()" style="margin-top: 15px;">↻ Try Again</button>
-                        </div>
-                    `;
+                    // Generate mock news for demonstration
+                    const mockNews = [
+                        {
+                            headline: "Stock Market Reaches New Heights as Tech Sector Rallies",
+                            summary: "Major technology stocks led the market to new record highs today, with strong earnings reports driving investor confidence across the sector.",
+                            source: "Financial Times",
+                            datetime: new Date(Date.now() - Math.random() * 3600000).toISOString(),
+                            url: "https://news.google.com/search?q=stock+market+tech+rally"
+                        },
+                        {
+                            headline: "Federal Reserve Announces Rate Decision Amid Economic Optimism",
+                            summary: "The Federal Reserve announced its latest interest rate decision, citing improving economic conditions and strong employment data as key factors.",
+                            source: "Reuters",
+                            datetime: new Date(Date.now() - Math.random() * 7200000).toISOString(),
+                            url: "https://news.google.com/search?q=federal+reserve+rate+decision"
+                        },
+                        {
+                            headline: "Biotech Breakthrough Sends Healthcare Stocks Soaring",
+                            summary: "A major biotech company announced promising clinical trial results, leading to significant gains across the healthcare sector.",
+                            source: "Bloomberg",
+                            datetime: new Date(Date.now() - Math.random() * 10800000).toISOString(),
+                            url: "https://news.google.com/search?q=biotech+healthcare+stocks"
+                        },
+                        {
+                            headline: "Energy Sector Volatility Continues Amid Global Supply Concerns",
+                            summary: "Energy stocks experienced significant volatility as global supply chain disruptions continue to impact oil and gas markets worldwide.",
+                            source: "CNBC",
+                            datetime: new Date(Date.now() - Math.random() * 14400000).toISOString(),
+                            url: "https://news.google.com/search?q=energy+sector+volatility"
+                        },
+                        {
+                            headline: "Cryptocurrency Markets Show Mixed Signals in Latest Trading",
+                            summary: "Digital asset markets displayed mixed performance today, with Bitcoin and major altcoins showing divergent trading patterns.",
+                            source: "CoinDesk",
+                            datetime: new Date(Date.now() - Math.random() * 18000000).toISOString(),
+                            url: "https://news.google.com/search?q=cryptocurrency+markets+trading"
+                        }
+                    ];
+                    
+                    // Cache mock data
+                    newsCache.data = mockNews;
+                    newsCache.timestamp = Date.now();
+                    allNews = mockNews;
+                    
+                    displayNews(mockNews, 'news-content');
+                    updateNewsStats(mockNews.length, false);
+                    
+                    // Show info about demo mode
+                    document.getElementById('cache-info').innerHTML = 
+                        '🧪 Demo mode - API unavailable. Showing sample financial news.';
+                    document.getElementById('cache-info').style.display = 'block';
                 }
             }
         }

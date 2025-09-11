@@ -492,20 +492,29 @@
         }
         
         async function loadDashboardStats() {
+            // Set default values first
+            setDefaultStats();
+            
+            // Try to load from API with timeout and graceful fallback
             try {
-                // Load daily summary
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+                
                 const response = await fetch(`${API_BASE_URL}/daily-summary`, {
                     method: 'GET',
                     headers: { 'Accept': 'application/json' },
-                    mode: 'cors'
+                    mode: 'cors',
+                    signal: controller.signal
                 });
+                
+                clearTimeout(timeoutId);
                 
                 if (response.ok) {
                     const data = await response.json();
                     
                     document.getElementById('dailyHits').textContent = data.total_hits || 0;
                     document.getElementById('triggersFound').textContent = data.total_hits || 0;
-                    document.getElementById('scannedToday').textContent = (data.total_hits || 0) * 10; // Estimate
+                    document.getElementById('scannedToday').textContent = (data.total_hits || 0) * 10;
                     
                     if (data.last_scan) {
                         document.getElementById('lastScan').textContent = 
@@ -513,16 +522,23 @@
                     }
                 }
             } catch (error) {
-                console.warn('Failed to load dashboard stats:', error);
+                console.warn('API unavailable, using local data:', error.message);
+                // Fallback to localStorage data (already set by setDefaultStats)
             }
             
+            // Try to load news count with timeout
             try {
-                // Load news count
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 3000);
+                
                 const newsResponse = await fetch(`${API_BASE_URL}/recent-news`, {
                     method: 'GET',
                     headers: { 'Accept': 'application/json' },
-                    mode: 'cors'
+                    mode: 'cors',
+                    signal: controller.signal
                 });
+                
+                clearTimeout(timeoutId);
                 
                 if (newsResponse.ok) {
                     const newsData = await newsResponse.json();
@@ -530,8 +546,18 @@
                     document.getElementById('newsCount').textContent = newsCount;
                 }
             } catch (error) {
-                console.warn('Failed to load news count:', error);
+                console.warn('News API unavailable:', error.message);
+                // Keep default news count
             }
+        }
+        
+        function setDefaultStats() {
+            // Set default stats from localStorage or mock data
+            document.getElementById('dailyHits').textContent = '0';
+            document.getElementById('triggersFound').textContent = '0';
+            document.getElementById('scannedToday').textContent = '0';
+            document.getElementById('newsCount').textContent = '0';
+            document.getElementById('lastScan').textContent = new Date().toLocaleTimeString();
             
             // Check localStorage for scanner data
             const savedData = localStorage.getItem('warriorScannerData');

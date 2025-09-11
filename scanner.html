@@ -969,21 +969,30 @@
         }
         
         async function loadDailyStats() {
+            // Set default value first
+            const dailyHitsEl = document.getElementById('dailyHits');
+            if (dailyHitsEl) dailyHitsEl.textContent = '0';
+            
             try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 2000); // 2 second timeout
+                
                 const response = await fetch(`${API_BASE_URL}/daily-summary`, {
                     method: 'GET',
                     headers: { 'Accept': 'application/json' },
-                    mode: 'cors'
+                    mode: 'cors',
+                    signal: controller.signal
                 });
+                
+                clearTimeout(timeoutId);
                 
                 if (response.ok) {
                     const data = await response.json();
-                    
-                    const dailyHitsEl = document.getElementById('dailyHits');
                     if (dailyHitsEl) dailyHitsEl.textContent = data.total_hits || 0;
                 }
             } catch (error) {
-                console.warn('Failed to load daily stats:', error);
+                console.warn('Daily stats API unavailable:', error.message);
+                // Keep default value
             }
         }
     </script>
