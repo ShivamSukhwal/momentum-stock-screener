@@ -387,10 +387,10 @@
             <!-- Scanner Controls -->
             <div class="scanner-controls">
                 <div class="controls-left">
-                    <button id="startBtn" class="scanner-btn start" onclick="startLiveMomentumFeed()">
+                    <button id="startBtn" class="scanner-btn start">
                         ▶️ Start Scanning
                     </button>
-                    <button id="stopBtn" class="scanner-btn stop" onclick="stopLiveMomentumFeed()" disabled>
+                    <button id="stopBtn" class="scanner-btn stop" disabled>
                         ⏹️ Stop Scanning
                     </button>
                     <div class="status-display">
@@ -995,6 +995,16 @@
                 // Keep default value
             }
         }
+        
+        // DOM Content Loaded Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Button event listeners
+            document.getElementById('startBtn').addEventListener('click', startLiveMomentumFeed);
+            document.getElementById('stopBtn').addEventListener('click', stopLiveMomentumFeed);
+            
+            // Load saved data on page load
+            loadRunnerData();
+        });
     </script>
 </body>
 </html>

@@ -397,8 +397,8 @@
             <div class="tracker-input">
                 <div class="input-row">
                     <input type="text" id="tickerInput" class="ticker-input" placeholder="TSLA" maxlength="10">
-                    <button class="track-btn" onclick="trackTicker()">📊 Track Stock</button>
-                    <button class="refresh-btn" onclick="refreshCurrentTicker()">↻ Refresh Data</button>
+                    <button class="track-btn" id="trackBtn">📊 Track Stock</button>
+                    <button class="refresh-btn" id="refreshDataBtn">↻ Refresh Data</button>
                 </div>
             </div>
             
@@ -876,6 +876,20 @@
                 newsContainer.innerHTML = newsHtml;
             }
         }
+        
+        // DOM Content Loaded Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Button event listeners
+            document.getElementById('trackBtn').addEventListener('click', trackTicker);
+            document.getElementById('refreshDataBtn').addEventListener('click', refreshCurrentTicker);
+            
+            // Enter key support for ticker input
+            document.getElementById('tickerInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    trackTicker();
+                }
+            });
+        });
     </script>
 </body>
 </html>

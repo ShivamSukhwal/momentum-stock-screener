@@ -333,7 +333,7 @@
                     <h3 style="color: #2c3e50; margin-bottom: 5px;">📡 Live News Feed</h3>
                     <p style="color: #6c757d; margin: 0;">Auto-refreshed every 5 minutes • Smart caching for performance</p>
                 </div>
-                <button class="refresh-btn" onclick="loadNews()">↻ Refresh News</button>
+                <button class="refresh-btn" id="refreshBtn">↻ Refresh News</button>
             </div>
             
             <!-- News Statistics -->
@@ -358,11 +358,11 @@
             
             <!-- News Filters -->
             <div class="news-filters">
-                <button class="filter-btn active" onclick="filterNews('all')">All News</button>
-                <button class="filter-btn" onclick="filterNews('earnings')">📊 Earnings</button>
-                <button class="filter-btn" onclick="filterNews('merger')">🤝 M&A</button>
-                <button class="filter-btn" onclick="filterNews('ipo')">🎉 IPOs</button>
-                <button class="filter-btn" onclick="filterNews('breaking')">🚨 Breaking</button>
+                <button class="filter-btn active" data-filter="all">All News</button>
+                <button class="filter-btn" data-filter="earnings">📊 Earnings</button>
+                <button class="filter-btn" data-filter="merger">🤝 M&A</button>
+                <button class="filter-btn" data-filter="ipo">🎉 IPOs</button>
+                <button class="filter-btn" data-filter="breaking">🚨 Breaking</button>
             </div>
             
             <!-- Cache Information -->
@@ -405,8 +405,26 @@
         let allNews = [];
         let currentFilter = 'all';
         
-        // Load news on page load
-        loadNews();
+        // DOM Content Loaded Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load news on page load
+            loadNews();
+            
+            // Refresh button event listener
+            document.getElementById('refreshBtn').addEventListener('click', loadNews);
+            
+            // Filter buttons event listeners
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const filterType = this.getAttribute('data-filter');
+                    filterNews(filterType);
+                    
+                    // Update active state
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        });
         
         // Auto-refresh every 5 minutes
         setInterval(() => {
