@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🚀 Live Momentum Scanner | Stock Screener</title>
-    <!-- Cache Buster: Updated 2025-01-01 - Version 2.0 -->
+    <title>🚀 Always-On Momentum Scanner | Auto-Scanning</title>
+    <!-- Cache Buster: Updated 2025-01-01 - Version 3.0 - Always On -->
     <style>
         * {
             margin: 0;
@@ -85,43 +85,6 @@
             gap: 15px;
         }
 
-        .scanner-btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .scanner-btn.start {
-            background: linear-gradient(135deg, #28a745, #20c997);
-            color: white;
-        }
-
-        .scanner-btn.start:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
-        }
-
-        .scanner-btn.stop {
-            background: linear-gradient(135deg, #dc3545, #e74c3c);
-            color: white;
-        }
-
-        .scanner-btn.stop:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
-        }
-
-        .scanner-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
 
         .status-display {
             display: flex;
@@ -298,23 +261,17 @@
             <a href="tracker.html" class="nav-link">📊 Tracker</a>
             <a href="daily-log.html" class="nav-link">📊 Daily Log</a>
         </div>
-        <h1>🚀 Live Momentum Scanner</h1>
-        <p>Real-time stock momentum detection • Ross Cameron style • Ultra-aggressive scanning</p>
+        <h1>🚀 Always-On Momentum Scanner</h1>
+        <p>Continuous real-time stock momentum detection • Auto-scanning 24/7 • Ross Cameron style</p>
     </div>
     
     <div class="scanner-content">
-        <!-- Scanner Controls -->
+        <!-- Scanner Status -->
         <div class="scanner-controls">
             <div class="controls-left">
-                <button id="startBtn" class="scanner-btn start">
-                    ▶️ Start Scanning
-                </button>
-                <button id="stopBtn" class="scanner-btn stop" disabled>
-                    ⏹️ Stop Scanning
-                </button>
                 <div class="status-display">
-                    <div id="statusDot" class="status-dot"></div>
-                    <span id="liveStatusText">Ready to scan</span>
+                    <div id="statusDot" class="status-dot active"></div>
+                    <span id="liveStatusText">🚀 Always-On Scanner • Auto-scanning momentum</span>
                 </div>
             </div>
             <div class="controls-right">
@@ -362,8 +319,8 @@
 
     <script>
         // Version Check - This should appear in console if correct version loads
-        console.log('🚀 SCANNER v2.0 LOADED - NO ONCLICK HANDLERS - Built from scratch');
-        console.log('✅ If you see this message, the new version is loading correctly');
+        console.log('🚀 ALWAYS-ON SCANNER v3.0 LOADED - Continuous Auto-Scanning');
+        console.log('✅ Scanner will start automatically and run continuously');
         
         // Global variables
         const API_BASE_URL = 'https://shivamyourmom.com/api';
@@ -377,6 +334,9 @@
         updateScanStats(0, 0);
         loadDailyStats();
         loadRunnerData();
+        
+        // Auto-start scanner when page loads
+        liveFeedActive = true;
         
         // Market timing functions
         function isMarketOpenForScanning() {
@@ -410,52 +370,18 @@
             return "🔴 Market Closed";
         }
 
-        // Main scanner functions
-        function startLiveMomentumFeed() {
-            liveFeedActive = true;
+        // Auto-start continuous scanning
+        function initializeScanner() {
+            updateLiveStatus('🚀 Always-On Scanner • Initializing momentum detection...');
             
-            // Update UI safely
-            const startBtn = document.getElementById('startBtn');
-            const stopBtn = document.getElementById('stopBtn');
-            const statusDot = document.getElementById('statusDot');
-            
-            if (startBtn) startBtn.disabled = true;
-            if (stopBtn) stopBtn.disabled = false;
-            if (statusDot) statusDot.classList.add('active');
-            
-            // Clear any existing data
-            runnerHistory = [];
-            updateRunnerTable();
-            
-            updateLiveStatus('🚀 Scanner started - Hunting for momentum...');
+            // Start first scan immediately
             scanForTriggers();
             
             // Set up continuous scanning every 5 seconds
             if (liveFeedInterval) clearInterval(liveFeedInterval);
             liveFeedInterval = setInterval(() => {
-                if (liveFeedActive) {
-                    scanForTriggers();
-                }
+                scanForTriggers();
             }, 5000);
-        }
-
-        function stopLiveMomentumFeed() {
-            liveFeedActive = false;
-            if (liveFeedInterval) {
-                clearInterval(liveFeedInterval);
-                liveFeedInterval = null;
-            }
-            
-            // Update UI safely
-            const startBtn = document.getElementById('startBtn');
-            const stopBtn = document.getElementById('stopBtn');
-            const statusDot = document.getElementById('statusDot');
-            
-            if (startBtn) startBtn.disabled = false;
-            if (stopBtn) stopBtn.disabled = true;
-            if (statusDot) statusDot.classList.remove('active');
-            
-            updateLiveStatus('Feed stopped');
         }
 
         // Core scanning function
@@ -834,7 +760,7 @@
         
         // Event Listeners Setup
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Scanner page loaded - setting up event listeners');
+            console.log('Scanner page loaded - starting always-on scanner');
             
             // Audio toggle
             const audioToggle = document.getElementById('audioToggle');
@@ -844,29 +770,10 @@
                 });
             }
             
-            // Button event listeners with defensive checks
-            const startBtn = document.getElementById('startBtn');
-            const stopBtn = document.getElementById('stopBtn');
+            // Initialize the always-on scanner
+            initializeScanner();
             
-            if (startBtn) {
-                startBtn.addEventListener('click', function() {
-                    console.log('Start button clicked');
-                    startLiveMomentumFeed();
-                });
-            } else {
-                console.error('Start button not found!');
-            }
-            
-            if (stopBtn) {
-                stopBtn.addEventListener('click', function() {
-                    console.log('Stop button clicked');
-                    stopLiveMomentumFeed();
-                });
-            } else {
-                console.error('Stop button not found!');
-            }
-            
-            console.log('Event listeners setup complete');
+            console.log('Always-on scanner initialized - running continuously');
         });
     </script>
 </body>
