@@ -2426,6 +2426,38 @@
             }
         }
         
+        // Calculate approximate float size in millions
+        function calculateFloat(data) {
+            // Estimate float based on market cap and price
+            // This is an approximation since exact float data may not be available
+            const price = data.last_price || 1;
+            const volume = data.today_volume || 0;
+            
+            // Simple heuristic: assume float is related to daily volume
+            // High volume stocks tend to have larger floats
+            let estimatedFloat;
+            
+            if (volume > 50000000) {
+                estimatedFloat = 300; // Large cap, large float
+            } else if (volume > 20000000) {
+                estimatedFloat = 150; // Mid cap
+            } else if (volume > 5000000) {
+                estimatedFloat = 75;  // Small cap
+            } else if (volume > 1000000) {
+                estimatedFloat = 25;  // Micro cap
+            } else {
+                estimatedFloat = 10;  // Very low volume, likely small float
+            }
+            
+            // Adjust based on price (higher price often means fewer shares outstanding)
+            if (price > 100) estimatedFloat *= 0.5;
+            else if (price > 50) estimatedFloat *= 0.7;
+            else if (price < 5) estimatedFloat *= 1.5;
+            else if (price < 1) estimatedFloat *= 2.0;
+            
+            return Math.max(1, Math.min(500, estimatedFloat)); // Cap between 1M and 500M
+        }
+        
         // Open daily log page
         function openDailyLog() {
             window.open('daily-log.html', '_blank');
