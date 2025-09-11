@@ -74,6 +74,7 @@ init_database()
 
 POLYGON_API_KEY = os.getenv("POLYGON_API_KEY")
 FINNHUB_API_KEY = os.getenv("FINNHUB_API_KEY")
+ALPHA_VANTAGE_API_KEY = os.getenv("ALPHA_VANTAGE_API_KEY")
 CLOUD_BACKUP_URL = os.getenv("CLOUD_BACKUP_URL")  # Optional: webhook URL for cloud backups
 if not POLYGON_API_KEY:
     raise ValueError("POLYGON_API_KEY not found in environment variables. Please check your .env file.")
@@ -475,6 +476,69 @@ def recent_news():
         
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@app.route("/alpha-vantage-news")
+def alpha_vantage_news():
+    """Get news from Alpha Vantage API"""
+    try:
+        if not ALPHA_VANTAGE_API_KEY:
+            return jsonify({"error": "Alpha Vantage API key not configured"}), 500
+            
+        # Alpha Vantage News & Sentiment API
+        url = "https://www.alphavantage.co/query"
+        params = {
+            'function': 'NEWS_SENTIMENT',
+            'tickers': 'AAPL,GOOGL,MSFT,TSLA,AMZN,NVDA,META,NFLX,AMD,CRM,ORCL,ADBE,NOW,SNOW,PLTR,SOFI',
+            'limit': 50,
+            'sort': 'LATEST',
+            'apikey': ALPHA_VANTAGE_API_KEY
+        }
+        
+        response = requests.get(url, params=params, timeout=15)
+        response.raise_for_status()
+        data = response.json()
+        
+        # Check for API limit response
+        if 'Note' in data or 'Information' in data:
+            return jsonify({"error": "Alpha Vantage API limit reached", "message": data.get('Note', data.get('Information'))}), 429
+            
+        articles = []
+        if 'feed' in data:
+            for item in data['feed']:
+                # Convert Alpha Vantage format to our standard format
+                article = {
+                    "headline": item.get("title", ""),
+                    "summary": item.get("summary", "")[:300] + "..." if len(item.get("summary", "")) > 300 else item.get("summary", ""),
+                    "source": item.get("source", "Alpha Vantage"),
+                    "datetime": item.get("time_published", ""),
+                    "url": item.get("url", ""),
+                    "related_tickers": []
+                }
+                
+                # Extract ticker sentiment data
+                if 'ticker_sentiment' in item and item['ticker_sentiment']:
+                    article["related_tickers"] = [t.get('ticker', '') for t in item['ticker_sentiment']]
+                
+                # Convert datetime format if needed
+                if article["datetime"]:
+                    try:
+                        # Alpha Vantage format: YYYYMMDDTHHMMSS
+                        if 'T' in article["datetime"] and len(article["datetime"]) == 15:
+                            dt_str = article["datetime"]
+                            formatted_dt = f"{dt_str[:4]}-{dt_str[4:6]}-{dt_str[6:8]}T{dt_str[9:11]}:{dt_str[11:13]}:{dt_str[13:15]}"
+                            article["datetime"] = formatted_dt
+                    except:
+                        # Keep original if parsing fails
+                        pass
+                
+                articles.append(article)
+        
+        return jsonify({"articles": articles, "count": len(articles)}), 200
+        
+    except requests.exceptions.RequestException as e:
+        return jsonify({"error": f"Alpha Vantage API error: {str(e)}"}), 502
+    except Exception as e:
+        return jsonify({"error": f"Unexpected error: {str(e)}"}), 500
 
 def extract_symbols_from_text(text):
     """Extract potential stock symbols from news text"""
