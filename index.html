@@ -2629,25 +2629,54 @@
         // Load stock chart for ticker
         function loadStockChart(ticker) {
             console.log('loadStockChart called for:', ticker);
-            const chartFrame = document.getElementById('stock-chart');
             const chartContainer = document.getElementById('stock-chart-container');
-            console.log('Chart elements found - frame:', !!chartFrame, 'container:', !!chartContainer);
+            console.log('Chart container found:', !!chartContainer);
             
             if (chartContainer) {
-                // Use TradingView simple widget
-                const chartUrl = `https://s.tradingview.com/widgetembed/?frameElementId=tradingview_chart&symbol=NASDAQ:${ticker}&interval=5&hidesidetoolbar=1&hidetoptoolbar=1&symboledit=1&saveimage=1&toolbarbg=F1F3F6&studies=[]&hideideas=1&theme=light&style=1&timezone=Etc%2FUTC&locale=en`;
-                console.log('Chart URL:', chartUrl);
+                console.log('Loading chart for ticker:', ticker);
                 
+                // Use a simpler approach with multiple fallback options
+                // First show a loading state
                 chartContainer.innerHTML = `
-                    <iframe src="${chartUrl}" 
-                        width="100%" 
-                        height="400" 
-                        frameborder="0" 
-                        scrolling="no"
-                        style="border-radius: 8px; background: white;">
-                    </iframe>
+                    <div style="width: 100%; height: 400px; border: 1px solid #ddd; border-radius: 8px; background: #f8f9fa; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                        <div style="text-align: center;">
+                            <div style="margin-bottom: 15px;">
+                                <div class="spinner" style="margin: 0 auto;"></div>
+                            </div>
+                            <h3 style="color: #333; margin: 0;">${ticker.toUpperCase()}</h3>
+                            <p style="color: #666; margin: 5px 0;">Loading interactive chart...</p>
+                        </div>
+                    </div>
                 `;
-                console.log('Chart iframe loaded');
+                
+                // Load chart after a brief delay to ensure container is ready
+                setTimeout(() => {
+                    chartContainer.innerHTML = `
+                        <div style="position: relative; width: 100%; height: 400px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; background: white;">
+                            <div style="position: absolute; top: 10px; left: 10px; z-index: 10; background: rgba(255,255,255,0.9); padding: 5px 10px; border-radius: 4px; font-size: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                📊 ${ticker.toUpperCase()} Chart
+                            </div>
+                            <iframe 
+                                src="https://www.tradingview.com/widgetembed/?frameElementId=tradingview_${ticker}&symbol=${ticker}&interval=D&hidesidetoolbar=1&hidetoptoolbar=1&symboledit=1&saveimage=1&toolbarbg=ffffff&studies=[]&hideideas=1&theme=light&style=1&timezone=Etc%2FUTC&locale=en&utm_source=localhost&utm_medium=widget" 
+                                width="100%" 
+                                height="100%" 
+                                frameborder="0" 
+                                scrolling="no"
+                                style="display: block; border: none;"
+                                onload="console.log('✅ Chart loaded successfully for ${ticker}')"
+                                onerror="console.log('❌ Chart failed to load for ${ticker}'); this.style.display='none'; this.parentNode.innerHTML='<div style=&quot;text-align: center; padding: 50px; color: #666;&quot;><h3>Chart temporarily unavailable</h3><p>Try refreshing or view on external site</p></div>';">
+                            </iframe>
+                        </div>
+                        <div style="margin-top: 10px; text-align: center; padding: 8px; background: #f8f9fa; border-radius: 6px;">
+                            <small style="color: #666;">
+                                📈 Interactive chart • 
+                                <a href="https://finance.yahoo.com/quote/${ticker}" target="_blank" style="color: #3498db; text-decoration: none;">Yahoo Finance</a> • 
+                                <a href="https://www.tradingview.com/symbols/${ticker}" target="_blank" style="color: #3498db; text-decoration: none;">TradingView</a>
+                            </small>
+                        </div>
+                    `;
+                }, 500);
+                console.log('Chart setup complete for:', ticker);
             } else {
                 console.error('Chart container not found!');
             }
