@@ -1213,6 +1213,11 @@
         // Load top gainers in $2-$20 range
         async function loadGainers() {
             const container = document.getElementById('gainers-content');
+            if (!container) {
+                console.warn('gainers-content element not found - skipping loadGainers');
+                return;
+            }
+            
             container.innerHTML = `
                 <div class="loading">
                     <div class="spinner"></div>
@@ -1365,6 +1370,10 @@
         // Load breaking news with caching and faster fallback
         async function loadNews() {
             const container = document.getElementById('news-content');
+            if (!container) {
+                console.warn('news-content element not found - skipping loadNews');
+                return;
+            }
             
             // Check cache first (5 minute cache)
             const now = Date.now();
@@ -1935,6 +1944,10 @@
         // Update the runner table (Warrior Trading style with multiple entries)
         function updateRunnerTable() {
             const tableBody = document.getElementById('runnerTableBody');
+            if (!tableBody) {
+                console.warn('runnerTableBody element not found - skipping updateRunnerTable');
+                return;
+            }
             
             if (runnerHistory.length === 0) {
                 tableBody.innerHTML = `
