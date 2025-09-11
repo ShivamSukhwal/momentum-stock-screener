@@ -681,6 +681,8 @@
                                     change_pct: changePct,
                                     volume: adaptedData.volume,
                                     rel_volume: adaptedData.relative_volume,
+                                    float: 0, // Default float - will be N/A in display
+                                    latestNews: `<button onclick="window.open('tracker.html?ticker=${ticker}', '_blank')" class="tracker-btn">📊 ${ticker}</button>`,
                                     timestamp: new Date(),
                                     is_new_move: isNewMove,
                                     category: getRunnerCategory(changePct),
@@ -1186,10 +1188,8 @@
                 // Return top movers first, then enrich in background
                 const topMovers = allMovers.slice(0, 30);
                 
-                // Enrich data in background and update display
-                enrichMoversData(topMovers).then(() => {
-                    updateRunnerDisplay();
-                });
+                // Skip enrichment for now - data already has buttons
+                // enrichMoversData(topMovers);
                 
                 return topMovers; // Return top 30 movers
                 
@@ -1251,10 +1251,8 @@
                 // Return top movers first, then enrich in background
                 const topMovers = allMovers.slice(0, 30);
                 
-                // Enrich data in background and update display
-                enrichMoversData(topMovers).then(() => {
-                    updateRunnerDisplay();
-                });
+                // Skip enrichment for now - data already has buttons
+                // enrichMoversData(topMovers);
                 
                 return topMovers; // Return top 30 movers
                 
