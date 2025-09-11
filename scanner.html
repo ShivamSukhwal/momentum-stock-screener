@@ -668,29 +668,29 @@
                                             change_pct: currentChangePct,
                                             timestamp: new Date()
                                         });
-                                        
-                                        // Play alert for new hot runners or significant moves
-                                        const isNewHotRunner = runner.category.sound;
-                                        if (isNewHotRunner && audioEnabled) {
-                                            playAlert(runner.category.level === 'explosive' ? 1000 : 800, 300);
-                                        }
-                                        
-                                        // Log to backend (simplified)
-                                        logScannerHit({
-                                            ticker: ticker,
-                                            trigger_type: runner.is_new_move ? 'price_move_' + runner.category.level : 'running_up_' + runner.category.level,
-                                            price: runner.price,
-                                            change_pct: runner.change_pct,
-                                            volume: runner.volume,
-                                            rel_volume: runner.rel_volume,
-                                            breakout_detected: false,
-                                            news_detected: !!newsData,
-                                            momentum_score: 75
-                                        });
-                                        
-                                        triggersFound++;
                                     }
                                 });
+                                
+                                // Play alert for new hot runners or significant moves
+                                const isNewHotRunner = runner.category.sound;
+                                if (isNewHotRunner && audioEnabled) {
+                                    playAlert(runner.category.level === 'explosive' ? 1000 : 800, 300);
+                                }
+                                
+                                // Log to backend (simplified)
+                                logScannerHit({
+                                    ticker: ticker,
+                                    trigger_type: runner.is_new_move ? 'price_move_' + runner.category.level : 'running_up_' + runner.category.level,
+                                    price: runner.price,
+                                    change_pct: runner.change_pct,
+                                    volume: runner.volume,
+                                    rel_volume: runner.rel_volume,
+                                    breakout_detected: false,
+                                    news_detected: !!newsData,
+                                    momentum_score: 75
+                                });
+                                
+                                triggersFound++;
                                 
                                 // Small delay between requests
                                 await new Promise(resolve => setTimeout(resolve, 200));
